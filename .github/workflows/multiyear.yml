@@ -1,0 +1,23 @@
+name: ES multiyear robustness
+on:
+  push:
+    paths:
+      - 'multiyear_backtest.py'
+      - '.github/workflows/multiyear.yml'
+  workflow_dispatch:
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests
+      - run: python multiyear_backtest.py | tee multiyear_results.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: multiyear-results
+          path: |
+            multiyear_results.txt
+            multiyear_trades.csv
