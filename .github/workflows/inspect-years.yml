@@ -1,0 +1,21 @@
+name: Inspect ES yearly data
+on:
+  push:
+    paths:
+      - 'inspect_years.py'
+      - '.github/workflows/inspect-years.yml'
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas requests
+      - run: python inspect_years.py | tee inspect_years_results.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inspect-years-results
+          path: inspect_years_results.txt
