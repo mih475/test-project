@@ -1,0 +1,16 @@
+name: Databento ES trades cost quote
+on:
+  workflow_dispatch:
+jobs:
+  quote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install databento
+      - name: Quote ES trades data cost
+        env:
+          DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
+        run: python databento_quote.py
