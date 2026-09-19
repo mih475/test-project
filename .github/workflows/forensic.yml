@@ -1,0 +1,41 @@
+name: ES forensic analysis
+on:
+  push:
+    paths:
+      - 'forensic_analysis.py'
+      - '.github/workflows/forensic.yml'
+  workflow_dispatch:
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests
+      - name: Generate multiyear trades
+        shell: bash
+        run: |
+          set -o pipefail
+          cp multiyear_backtest.py multiyear_forensic_tmp.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('multiyear_forensic_tmp.py')
+          s=p.read_text().replace("pd.to_datetime(df['datetime_et'])", "pd.to_datetime(df['datetime_et'], utc=True).dt.tz_convert('America/New_York')")
+          p.write_text(s)
+          PY
+          python multiyear_forensic_tmp.py > multiyear_forensic_base.txt
+      - name: Run forensic diagnostics
+        shell: bash
+        run: |
+          set -o pipefail
+          python forensic_analysis.py | tee forensic_results.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: forensic-results
+          path: |
+            forensic_results.txt
+            forensic_enriched_trades.csv
+            multiyear_forensic_base.txt
