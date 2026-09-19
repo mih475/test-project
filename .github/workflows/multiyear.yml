@@ -14,8 +14,22 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pandas numpy requests
-      - run: python multiyear_backtest.py | tee multiyear_results.txt
+      - name: Patch mixed EST/EDT timestamps
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('multiyear_backtest.py')
+          s = p.read_text()
+          s = s.replace("pd.to_datetime(df['datetime_et'])", "pd.to_datetime(df['datetime_et'], utc=True).dt.tz_convert('America/New_York')")
+          p.write_text(s)
+          PY
+      - name: Run multiyear backtest
+        shell: bash
+        run: |
+          set -o pipefail
+          python multiyear_backtest.py | tee multiyear_results.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: multiyear-results
           path: |
