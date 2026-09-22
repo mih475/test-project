@@ -10,7 +10,7 @@ def load_all():
     for y in YEARS:
         r=requests.get(BASE.format(y),timeout=180); r.raise_for_status()
         df=pd.read_csv(io.StringIO(r.text))
-        # Normalize all provider timestamps to timezone-aware New York time.
+        # Normalize provider timestamps to timezone-aware New York time.
         df['datetime_et']=pd.to_datetime(df['datetime_et'],utc=True).dt.tz_convert('America/New_York')
         if 'rth' in df.columns:
             df=df[df['rth'].astype(str).str.lower().eq('true')]
@@ -22,18 +22,27 @@ def load_all():
         df['session']=df.datetime_et.dt.date
         df['year']=y
 
-        # Explicit continuous-contract construction: use the highest-RTH-volume
-        # contract for each session, instead of relying on arbitrary timestamp dedupe.
-        dayvol=df.groupby(['session','symbol'],as_index=False).volume.sum()
-        idx=dayvol.groupby('session').volume.idxmax()
-        active=dayvol.loc[idx,['session','symbol']].rename(columns={'symbol':'active_symbol'})
-        df=df.merge(active,on='session',how='left')
-        df=df[df.symbol.eq(df.active_symbol)].drop(columns='active_symbol')
-        df=df.drop_duplicates('datetime_et',keep='first').sort_values('datetime_et')
-        parts.append(df)
-        print('loaded',y,'RTH rows',len(df),'sessions',df.session.nunique(),'symbols',sorted(df.symbol.dropna().unique())[:8])
+        # The source occasionally switches futures contracts inside an RTH session.
+        # An unadjusted contract switch can create an artificial price jump that would
+        # contaminate session VWAP/standard deviation, so exclude those roll sessions
+        # entirely instead of stitching two price levels together or dropping half a day.
+        sym_per_session=df.groupby('session').symbol.nunique()
+        roll_sessions=set(sym_per_session[sym_per_session>1].index)
+        if roll_sessions:
+            print('excluding roll-switch sessions',y,len(roll_sessions),sorted(roll_sessions))
+            df=df[~df.session.isin(roll_sessions)].copy()
 
-    x=pd.concat(parts,ignore_index=True).drop_duplicates('datetime_et',keep='first').sort_values('datetime_et')
+        # Resolve any remaining exact duplicate timestamps conservatively by keeping
+        # the row with the greatest one-minute volume. Normal sessions are otherwise
+        # preserved minute-for-minute.
+        before=len(df)
+        df=df.sort_values(['datetime_et','volume'],ascending=[True,False]).drop_duplicates('datetime_et',keep='first').sort_values('datetime_et')
+        resolved=before-len(df)
+        parts.append(df)
+        print('loaded',y,'RTH rows',len(df),'sessions',df.session.nunique(),'duplicates_resolved',resolved,'symbols',sorted(df.symbol.dropna().unique())[:8])
+
+    x=pd.concat(parts,ignore_index=True)
+    x=x.sort_values(['datetime_et','volume'],ascending=[True,False]).drop_duplicates('datetime_et',keep='first').sort_values('datetime_et')
     x=x.set_index('datetime_et')
     x['session']=x.index.date
     return x
