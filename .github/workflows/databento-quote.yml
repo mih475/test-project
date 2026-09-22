@@ -1,6 +1,10 @@
 name: Databento ES trades cost quote
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'databento_quote.py'
+      - '.github/workflows/databento-quote.yml'
 jobs:
   quote:
     runs-on: ubuntu-latest
