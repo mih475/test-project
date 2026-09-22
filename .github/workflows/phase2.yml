@@ -1,0 +1,32 @@
+name: ES Phase 2 diagnostics
+on:
+  push:
+    paths:
+      - 'phase2_diagnostics.py'
+      - 'multiyear_backtest.py'
+      - '.github/workflows/phase2.yml'
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests
+      - name: Run Phase 2 diagnostics
+        shell: bash
+        run: |
+          set -o pipefail
+          python phase2_diagnostics.py | tee phase2_results.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase2-results
+          path: |
+            phase2_results.txt
+            phase2_trades.csv
+            phase2_controls.csv
