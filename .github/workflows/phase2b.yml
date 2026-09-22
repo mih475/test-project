@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'phase2b_diagnostics.py'
+      - 'phase2b_runner.py'
       - 'multiyear_backtest.py'
       - '.github/workflows/phase2b.yml'
   workflow_dispatch:
@@ -20,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python phase2b_diagnostics.py | tee phase2b_results.txt
+          python phase2b_runner.py | tee phase2b_results.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
