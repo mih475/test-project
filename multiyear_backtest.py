@@ -10,17 +10,30 @@ def load_all():
     for y in YEARS:
         r=requests.get(BASE.format(y),timeout=180); r.raise_for_status()
         df=pd.read_csv(io.StringIO(r.text))
-        df['datetime_et']=pd.to_datetime(df['datetime_et'])
-        # Use provider RTH flag; preserves daylight-saving offsets encoded in timestamps.
+        # Normalize all provider timestamps to timezone-aware New York time.
+        df['datetime_et']=pd.to_datetime(df['datetime_et'],utc=True).dt.tz_convert('America/New_York')
         if 'rth' in df.columns:
             df=df[df['rth'].astype(str).str.lower().eq('true')]
-        df=df[['datetime_et','open','high','low','close','volume','symbol','year']].copy()
+        keep=['datetime_et','open','high','low','close','volume','symbol']
+        df=df[keep].copy()
         for c in ['open','high','low','close','volume']:
             df[c]=pd.to_numeric(df[c],errors='coerce')
-        df=df.dropna().sort_values('datetime_et')
+        df=df.dropna().sort_values(['datetime_et','symbol'])
+        df['session']=df.datetime_et.dt.date
+        df['year']=y
+
+        # Explicit continuous-contract construction: use the highest-RTH-volume
+        # contract for each session, instead of relying on arbitrary timestamp dedupe.
+        dayvol=df.groupby(['session','symbol'],as_index=False).volume.sum()
+        idx=dayvol.groupby('session').volume.idxmax()
+        active=dayvol.loc[idx,['session','symbol']].rename(columns={'symbol':'active_symbol'})
+        df=df.merge(active,on='session',how='left')
+        df=df[df.symbol.eq(df.active_symbol)].drop(columns='active_symbol')
+        df=df.drop_duplicates('datetime_et',keep='first').sort_values('datetime_et')
         parts.append(df)
-        print('loaded',y,'RTH rows',len(df),'symbols',sorted(df.symbol.dropna().unique())[:8])
-    x=pd.concat(parts,ignore_index=True).drop_duplicates('datetime_et').sort_values('datetime_et')
+        print('loaded',y,'RTH rows',len(df),'sessions',df.session.nunique(),'symbols',sorted(df.symbol.dropna().unique())[:8])
+
+    x=pd.concat(parts,ignore_index=True).drop_duplicates('datetime_et',keep='first').sort_values('datetime_et')
     x=x.set_index('datetime_et')
     x['session']=x.index.date
     return x
@@ -62,8 +75,11 @@ def build_frame(df):
             z=pd.merge_asof(z.sort_values('ts'),r.sort_values('tf_ts'),left_on='ts',right_on='tf_ts',direction='backward')
         z=z.set_index('ts'); z.index.name='datetime_et'; pieces.append(z)
     x=pd.concat(pieces).sort_index()
-    # Signed bar-volume CVD proxy (not true bid/ask delta).
-    direction=np.where(x.close>x.open,1,np.where(x.close<x.open,-1,np.sign(x.close.diff().fillna(0))))
+    # Signed bar-volume CVD proxy (not true bid/ask delta). For doji bars,
+    # compare with the prior close only within the same session.
+    prev=x.groupby('session').close.shift(1)
+    fallback=np.sign((x.close-prev).fillna(0))
+    direction=np.where(x.close>x.open,1,np.where(x.close<x.open,-1,fallback))
     x['delta_proxy']=direction*x.volume
     x['cvd_proxy']=x.groupby('session').delta_proxy.cumsum()
     return x
@@ -169,7 +185,6 @@ def main():
     show('ALL MTF no CVD',mtf); show('ALL MTF + CVD proxy',cvd)
     print('\nYEAR BY YEAR - CVD PROXY')
     for y in YEARS: show(str(y),cvd[cvd.year==y])
-    # Primary untouched holdout: 2025. 2026 was previously examined in a separate preliminary dataset.
     show('DEVELOPMENT 2021-2024',cvd[cvd.year<=2024])
     show('PRIMARY HOLDOUT 2025',cvd[cvd.year==2025])
     show('RECENT CONFIRMATION 2026 (NOT PURE HOLDOUT)',cvd[cvd.year==2026])
