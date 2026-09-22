@@ -1,0 +1,31 @@
+name: ES Phase 2B diagnostics
+on:
+  push:
+    paths:
+      - 'phase2b_diagnostics.py'
+      - 'multiyear_backtest.py'
+      - '.github/workflows/phase2b.yml'
+  workflow_dispatch:
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests
+      - name: Run Phase 2B diagnostics
+        shell: bash
+        run: |
+          set -o pipefail
+          python phase2b_diagnostics.py | tee phase2b_results.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase2b-results
+          path: |
+            phase2b_results.txt
+            phase2b_enriched_trades.csv
+            phase2b_random_controls.csv
