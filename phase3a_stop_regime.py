@@ -27,7 +27,13 @@ def metrics(g):
 
 def main():
     raw=mb.load_all(); frame=mb.build_frame(raw)
-    t=p2.add_regime_features(frame,p2.generate_diagnostic(frame)).replace([np.inf,-np.inf],np.nan).reset_index(drop=True)
+    # pandas 3.x is stricter about merge-key dtypes. generate_diagnostic emits
+    # session as datetime64 while frame/add_regime_features groups it as Python
+    # date objects. Normalize the diagnostic key before the feature merge; this
+    # changes no strategy rule or observation.
+    diag=p2.generate_diagnostic(frame)
+    diag['session']=pd.to_datetime(diag['session']).dt.date
+    t=p2.add_regime_features(frame,diag).replace([np.inf,-np.inf],np.nan).reset_index(drop=True)
     dev=t[t.year<=2023]; val=t[t.year==2024]
     print('=== PHASE 3E: ONE-FILTER ENTRY SELECTIVITY ===')
     print('Original entry/stop/VWAP exit frozen. Exactly one filter is tested per rule. Thresholds come only from 2021-23 quartiles; 2024 validates; 2025/2026 reveal-only.')
@@ -51,7 +57,6 @@ def main():
     c=pd.DataFrame(candidates).sort_values(['floor_avgR','floor_PF'],ascending=False).reset_index(drop=True)
     print('\nTOP SINGLE-FILTER RULES -- RANKED WITHOUT 2025/26')
     print(c.head(20).round(4).to_string(index=False))
-    # Require positive after-cost expectancy and PF>1 in BOTH development and validation.
     q=c[(c.floor_avgR>0)&(c.floor_PF>1.0)]
     if len(q)==0:
         print('\nFROZEN_CANDIDATE NONE')
