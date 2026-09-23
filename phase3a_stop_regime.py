@@ -3,53 +3,56 @@ import pandas as pd
 import multiyear_backtest as mb
 import phase2b_diagnostics as p2
 
-BE_TRIGGERS=[0.5,0.75,1.0,1.5,2.0]
+PARTIAL_FRACS=[0.25,0.50,0.75]
+TRIGGER_R=1.0
 
-def simulate_be(d,tr,trigger_r):
-    """Original VWAP target and initial stop, with one change: after price reaches
-    +trigger_r R, move the stop to entry. Conservative 1-minute ordering: if a bar
-    can both arm BE and touch the original stop/target, adverse outcome is assumed.
-    Once BE is armed, a bar touching both BE and target is scored as BE.
+def simulate_partial(d,tr,frac):
+    """Take frac of position at +1R; leave remainder for original VWAP target.
+    Initial stop never moves. Same-bar stop/+1R ambiguity is scored as stop first.
+    This is the only strategy change in Phase 3D.
     """
     entry=float(tr.entry_price); risk=float(tr.risk_pts); direction=int(tr.dir_sign)
     stop=float(tr.stop_price); target=float(tr.target_price)
     loc=d.index.get_indexer([tr.entry_time])[0]
     if loc<0:return np.nan,'missing_entry'
-    armed=False
-    trigger=entry+direction*trigger_r*risk
+    trigger=entry+direction*TRIGGER_R*risk
+    partial=False
     for j in range(loc,len(d)):
         r=d.iloc[j]
         if direction==1:
-            hit_orig=r.low<=stop; hit_target=r.high>=target; hit_trigger=r.high>=trigger; hit_be=r.low<=entry
+            hit_stop=r.low<=stop; hit_target=r.high>=target; hit_trigger=r.high>=trigger
         else:
-            hit_orig=r.high>=stop; hit_target=r.low<=target; hit_trigger=r.low<=trigger; hit_be=r.high>=entry
-        if not armed:
-            if hit_orig and (hit_target or hit_trigger): return -1.0,'ambiguous_original_stop_first'
-            if hit_orig:return -1.0,'stop'
-            if hit_target:
-                rr=direction*(target-entry)/risk
-                return rr,'target_before_be'
+            hit_stop=r.high>=stop; hit_target=r.low<=target; hit_trigger=r.low<=trigger
+        target_r=direction*(target-entry)/risk
+        if not partial:
+            if hit_stop and (hit_target or hit_trigger): return -1.0,'ambiguous_stop_first'
+            if hit_stop:return -1.0,'stop_before_partial'
+            # If VWAP target is closer than +1R, the original target exits the full trade.
+            if hit_target and target_r<=TRIGGER_R:return target_r,'target_before_partial'
             if hit_trigger:
-                # Intrabar path after trigger is unknowable. If the same bar also
-                # touches entry, conservatively assume BE immediately after arming.
-                if hit_be:return 0.0,'ambiguous_arm_then_be'
-                armed=True
+                partial=True
+                # If target is also touched on this bar after the +1R level, both pieces are realized.
+                if hit_target:
+                    return frac*TRIGGER_R+(1-frac)*target_r,'partial_then_target_same_bar'
+            elif hit_target:
+                return target_r,'target'
         else:
-            if hit_be and hit_target:return 0.0,'ambiguous_be_first'
-            if hit_be:return 0.0,'breakeven'
+            if hit_stop and hit_target:
+                runner_r=-1.0
+                return frac*TRIGGER_R+(1-frac)*runner_r,'ambiguous_runner_stop_first'
+            if hit_stop:
+                return frac*TRIGGER_R+(1-frac)*(-1.0),'runner_stop'
             if hit_target:
-                rr=direction*(target-entry)/risk
-                return rr,'target'
-    px=float(d.iloc[-1].close)
-    rr=direction*(px-entry)/risk
-    if armed and rr<0: rr=0.0
-    return rr,'eod'
+                return frac*TRIGGER_R+(1-frac)*target_r,'runner_target'
+    px=float(d.iloc[-1].close); runner_r=direction*(px-entry)/risk
+    if partial:return frac*TRIGGER_R+(1-frac)*runner_r,'partial_runner_eod'
+    return runner_r,'eod'
 
 def stats(vals):
     v=pd.Series(vals,dtype=float).dropna(); w=v[v>0]; l=v[v<=0]
     pf=w.sum()/abs(l.sum()) if len(l) and abs(l.sum()) else np.inf
     eq=v.cumsum(); dd=eq-eq.cummax()
-    return len(v),100*(v>0).mean(),v.mean(),pf,v.sum(),dd.min(),100*(v==0).mean()
+    return len(v),100*(v>0).mean(),v.mean(),pf,v.sum(),dd.min()
 
 def net(vals,risk_pts,product='ES',slip_ticks=1):
     point=50.0 if product=='ES' else 5.0; comm=5.0 if product=='ES' else 1.50
@@ -57,45 +60,45 @@ def net(vals,risk_pts,product='ES',slip_ticks=1):
 
 def report(label,g,col):
     raw=stats(g[col]); es=stats(net(g[col],g.risk_pts,'ES',1)); mes=stats(net(g[col],g.risk_pts,'MES',1))
-    return {'exit':label,'n':raw[0],'raw_win':raw[1],'raw_be':raw[6],'raw_avgR':raw[2],'raw_PF':raw[3],
+    return {'exit':label,'n':raw[0],'raw_win':raw[1],'raw_avgR':raw[2],'raw_PF':raw[3],'raw_DD':raw[5],
             'ES1_avgR':es[2],'ES1_PF':es[3],'ES1_DD':es[5],'MES1_avgR':mes[2],'MES1_PF':mes[3]}
 
 def main():
     raw=mb.load_all(); frame=mb.build_frame(raw); t=p2.generate_diagnostic(frame).reset_index(drop=True)
-    print('=== PHASE 3C: BREAKEVEN PROTECTION ONLY ===')
-    print('Entry, initial stop, and original VWAP target are frozen. Only change: move stop to entry after +X R.')
-    print('Conservative 1-minute ambiguity rules favor the adverse/BE outcome. Selection uses 2021-23 + 2024 only; 2025/2026 reveal-only.')
+    print('=== PHASE 3D: PARTIAL +1R, RUNNER TO ORIGINAL VWAP ===')
+    print('Entry, initial stop, and original VWAP target are frozen. Only change: take 25/50/75% at +1R; runner keeps original stop and VWAP target.')
+    print('Same-bar stop/+1R ambiguity is adverse. Selection uses 2021-23 + 2024 only; 2025/2026 reveal-only.')
     by={pd.Timestamp(s):d.copy().sort_index() for s,d in frame.groupby('session',sort=False)}
-    for trig in BE_TRIGGERS:
+    for frac in PARTIAL_FRACS:
         vals=[]
         for _,tr in t.iterrows():
-            d=by.get(pd.Timestamp(tr.session)); rr,_=simulate_be(d,tr,trig) if d is not None else (np.nan,'missing_session'); vals.append(rr)
-        t[f'R_be{str(trig).replace(".","p")}']=vals
+            d=by.get(pd.Timestamp(tr.session)); rr,_=simulate_partial(d,tr,frac) if d is not None else (np.nan,'missing_session'); vals.append(rr)
+        t[f'R_partial{int(frac*100)}']=vals
     periods={'DEV21-23':t.year<=2023,'VAL24':t.year==2024,'EVAL25':t.year==2025,'RECENT26':t.year==2026,'ALL':pd.Series(True,index=t.index)}
     rows=[]
-    for trig in BE_TRIGGERS:
-        col=f'R_be{str(trig).replace(".","p")}'
+    for frac in PARTIAL_FRACS:
+        col=f'R_partial{int(frac*100)}'; label=f'PARTIAL_{int(frac*100)}pct_at_1R'
         for per,mask in periods.items():
-            x=report(f'BE_after_{trig:g}R',t[mask],col); x['period']=per; rows.append(x)
+            x=report(label,t[mask],col); x['period']=per; rows.append(x)
     out=pd.DataFrame(rows)
-    print('\nBREAKEVEN RESULTS')
-    print(out[['exit','period','n','raw_win','raw_be','raw_avgR','raw_PF','ES1_avgR','ES1_PF','MES1_avgR','MES1_PF','ES1_DD']].round(4).to_string(index=False))
+    print('\nPARTIAL RESULTS')
+    print(out[['exit','period','n','raw_win','raw_avgR','raw_PF','ES1_avgR','ES1_PF','MES1_avgR','MES1_PF','ES1_DD']].round(4).to_string(index=False))
     sel=[]
-    for trig in BE_TRIGGERS:
-        label=f'BE_after_{trig:g}R'; a=out[(out.exit==label)&(out.period=='DEV21-23')].iloc[0]; b=out[(out.exit==label)&(out.period=='VAL24')].iloc[0]
-        sel.append({'trigger_R':trig,'dev_win':a.raw_win,'val24_win':b.raw_win,'dev_ES1_avgR':a.ES1_avgR,'val24_ES1_avgR':b.ES1_avgR,
+    for frac in PARTIAL_FRACS:
+        label=f'PARTIAL_{int(frac*100)}pct_at_1R'; a=out[(out.exit==label)&(out.period=='DEV21-23')].iloc[0]; b=out[(out.exit==label)&(out.period=='VAL24')].iloc[0]
+        sel.append({'partial_frac':frac,'dev_win':a.raw_win,'val24_win':b.raw_win,'dev_ES1_avgR':a.ES1_avgR,'val24_ES1_avgR':b.ES1_avgR,
                     'dev_ES1_PF':a.ES1_PF,'val24_ES1_PF':b.ES1_PF,'floor_avgR':min(a.ES1_avgR,b.ES1_avgR),'floor_PF':min(a.ES1_PF,b.ES1_PF)})
     sel=pd.DataFrame(sel).sort_values(['floor_avgR','floor_PF'],ascending=False)
     print('\nSELECTION TABLE (2025/2026 NOT USED)'); print(sel.round(4).to_string(index=False))
     q=sel[(sel.floor_avgR>0)&(sel.floor_PF>1.0)]
     if len(q):
-        chosen=float(q.iloc[0].trigger_R); label=f'BE_after_{chosen:g}R'; print('FROZEN_CANDIDATE_BE_TRIGGER_R',chosen)
-        print('\nOUT-OF-SAMPLE REVEAL'); print(out[out.exit==label][['period','n','raw_win','raw_be','raw_avgR','raw_PF','ES1_avgR','ES1_PF','MES1_avgR','MES1_PF','ES1_DD']].round(4).to_string(index=False))
-    else: print('FROZEN_CANDIDATE_BE_TRIGGER_R NONE')
+        chosen=float(q.iloc[0].partial_frac); label=f'PARTIAL_{int(chosen*100)}pct_at_1R'; print('FROZEN_CANDIDATE_PARTIAL_FRAC',chosen)
+        print('\nOUT-OF-SAMPLE REVEAL'); print(out[out.exit==label][['period','n','raw_win','raw_avgR','raw_PF','ES1_avgR','ES1_PF','MES1_avgR','MES1_PF','ES1_DD']].round(4).to_string(index=False))
+    else: print('FROZEN_CANDIDATE_PARTIAL_FRAC NONE')
     print('\n70_PERCENT_CHECK')
-    for trig in BE_TRIGGERS:
-        label=f'BE_after_{trig:g}R'; a=out[(out.exit==label)&(out.period=='DEV21-23')].iloc[0]; b=out[(out.exit==label)&(out.period=='VAL24')].iloc[0]
-        print(f'BE {trig:g}R dev_win={a.raw_win:.2f}% val24_win={b.raw_win:.2f}% both_ge70={bool(a.raw_win>=70 and b.raw_win>=70)}')
+    for frac in PARTIAL_FRACS:
+        label=f'PARTIAL_{int(frac*100)}pct_at_1R'; a=out[(out.exit==label)&(out.period=='DEV21-23')].iloc[0]; b=out[(out.exit==label)&(out.period=='VAL24')].iloc[0]
+        print(f'partial={frac:.2f} dev_win={a.raw_win:.2f}% val24_win={b.raw_win:.2f}% both_ge70={bool(a.raw_win>=70 and b.raw_win>=70)}')
     out.to_csv('phase3a_stop_economics.csv',index=False); sel.to_csv('phase3a_top_candidates.csv',index=False); t.to_csv('phase3a_enriched_trades.csv',index=False)
     pd.DataFrame().to_csv('phase3a_random_controls.csv',index=False); sel.to_csv('phase3a_all_candidates.csv',index=False)
 if __name__=='__main__': main()
