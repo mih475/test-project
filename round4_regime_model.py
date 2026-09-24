@@ -173,7 +173,6 @@ def build_es_features():
                     "range": sess_range,
                 }
             else:
-                # Incomplete sessions are not allowed to seed next-session features.
                 row.update(
                     {
                         "entry": np.nan,
@@ -598,7 +597,7 @@ def main():
     results = pd.DataFrame(results)
 
     print("\nMODERN 2021-2023 — PRIMARY ECONOMICS (ES +1 tick)")
-    primary_table = results[(results.product == "ES") & (results.slip_ticks == 1)].copy()
+    primary_table = results[(results["product"] == "ES") & (results["slip_ticks"] == 1)].copy()
     cols = [
         "strategy", "trades", "trade_rate_pct", "win_pct", "avg_net_pts",
         "avg_dollars", "PF", "total_dollars", "DD_dollars", "sharpe",
