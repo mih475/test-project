@@ -10,34 +10,25 @@ BACKWARD = list(range(2016, 2021))
 NY = r2.NY
 
 
-def load_all():
-    full_parts=[]; rth_parts=[]; meta=[]
-    for y in YEARS:
-        q=requests.get(BASE.format(y),timeout=180); q.raise_for_status()
-        d=pd.read_csv(io.StringIO(q.text))
-        d['datetime_et']=pd.to_datetime(d['datetime_et'],utc=True).dt.tz_convert(NY)
-        for c in ['open','high','low','close','volume']:
-            d[c]=pd.to_numeric(d[c],errors='coerce')
-        d=d.dropna(subset=['datetime_et','open','high','low','close','volume','symbol']).copy()
-        d['rth_bool']=d['rth'].astype(str).str.lower().eq('true')
-        d=d.sort_values(['datetime_et','symbol'])
-        rr=d[d.rth_bool].copy(); rr['session']=rr.datetime_et.dt.date
-        ns=rr.groupby('session').symbol.nunique(); roll=set(ns[ns>1].index)
-        if roll: print('excluding roll-switch sessions',y,len(roll),sorted(roll))
-        rr=rr[~rr.session.isin(roll)].copy()
-        before=len(rr)
-        rr=(rr.sort_values(['datetime_et','volume'],ascending=[True,False])
-              .drop_duplicates('datetime_et',keep='first').sort_values('datetime_et'))
-        print('loaded',y,'RTH rows',len(rr),'sessions',rr.session.nunique(),'duplicates_resolved',before-len(rr))
-        for sess,sym in rr.groupby('session').symbol.first().items():
-            meta.append({'session':sess,'symbol':sym,'year':y})
-        rth_parts.append(rr); full_parts.append(d)
-    full=pd.concat(full_parts,ignore_index=True).sort_values(['datetime_et','volume'],ascending=[True,False])
-    full=full.drop_duplicates(['datetime_et','symbol'],keep='first').sort_values('datetime_et')
-    rth=pd.concat(rth_parts,ignore_index=True).sort_values('datetime_et')
-    rth=rth.drop_duplicates('datetime_et',keep='first').set_index('datetime_et')
-    rth['session']=rth.index.date
-    return full,rth,pd.DataFrame(meta).sort_values('session').reset_index(drop=True)
+def load_one_year(y):
+    q=requests.get(BASE.format(y),timeout=180); q.raise_for_status()
+    d=pd.read_csv(io.StringIO(q.text))
+    d['datetime_et']=pd.to_datetime(d['datetime_et'],utc=True).dt.tz_convert(NY)
+    for c in ['open','high','low','close','volume']:
+        d[c]=pd.to_numeric(d[c],errors='coerce')
+    d=d.dropna(subset=['datetime_et','open','high','low','close','volume','symbol']).copy()
+    d['rth_bool']=d['rth'].astype(str).str.lower().eq('true')
+    d=d.sort_values(['datetime_et','symbol'])
+    rr=d[d.rth_bool].copy(); rr['session']=rr.datetime_et.dt.date
+    ns=rr.groupby('session').symbol.nunique(); roll=set(ns[ns>1].index)
+    if roll: print('excluding roll-switch sessions',y,len(roll),sorted(roll))
+    rr=rr[~rr.session.isin(roll)].copy()
+    before=len(rr)
+    rr=(rr.sort_values(['datetime_et','volume'],ascending=[True,False])
+          .drop_duplicates('datetime_et',keep='first').sort_values('datetime_et'))
+    print('loaded',y,'RTH rows',len(rr),'sessions',rr.session.nunique(),'duplicates_resolved',before-len(rr))
+    rr=rr.set_index('datetime_et'); rr['session']=rr.index.date
+    return d,rr
 
 
 def block_stats(g, years, product='ES', slip=1):
@@ -53,14 +44,14 @@ def main():
     print('=== R2S5 FROZEN BACKWARD VALIDATION ===')
     print('Unseen backward block: 2016-2020. Original development: 2021-2023. 2024+ are not loaded.')
     print('Exact Round-2 R2S5 strategy function is reused without modification.')
-    full,rth,meta=load_all()
+    print('Year-by-year loading is a performance optimization only; strategy logic is unchanged.')
     trades=[]
-    for _,row in meta.iterrows():
-        sess=row.session; sym=row.symbol
-        d=rth[rth.session==sess].copy()
-        if len(d)==0: continue
-        eth=r2.full_for_session(full,sess,sym)
-        trades.extend(r2.s5_trend(d,eth,sess))
+    for y in YEARS:
+        full,rth=load_one_year(y)
+        for sess,d in rth.groupby('session',sort=False):
+            sym=d.symbol.iloc[0]
+            eth=r2.full_for_session(full,sess,sym)
+            trades.extend(r2.s5_trend(d.copy(),eth,sess))
     t=pd.DataFrame(trades).sort_values(['entry_time','exit_time']).reset_index(drop=True)
     t.to_csv('r2s5_backward_validation_trades.csv',index=False)
 
