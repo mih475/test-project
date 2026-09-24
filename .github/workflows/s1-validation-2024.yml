@@ -1,0 +1,29 @@
+name: S1 Validation 2024
+
+on:
+  push:
+    paths:
+      - 's1_validation_2024.py'
+      - '.github/workflows/s1-validation-2024.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pandas numpy requests
+      - name: Run frozen S1 2024 validation
+        run: python s1_validation_2024.py
+      - name: Upload validation outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: s1-validation-2024
+          path: |
+            s1_validation_2024_trades.csv
+            s1_validation_2024_costs.csv
