@@ -1,0 +1,28 @@
+name: R2S5 Backward Validation
+on:
+  push:
+    paths:
+      - 'r2s5_backward_validation.py'
+      - 'r2s5_backward_validation_plan.md'
+      - '.github/workflows/r2s5-backward-validation.yml'
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pandas numpy requests
+      - name: Run frozen R2S5 backward validation
+        run: python r2s5_backward_validation.py
+      - name: Upload outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2s5-backward-validation
+          path: |
+            r2s5_backward_validation_trades.csv
+            r2s5_backward_validation_costs.csv
