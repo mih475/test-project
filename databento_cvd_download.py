@@ -22,17 +22,23 @@ def minute_delta(df):
     x = df.copy()
     x["minute_utc"] = pd.to_datetime(x["ts_event"], utc=True).dt.floor("min")
     side = x["side"].astype(str)
-    size = pd.to_numeric(x["size"], errors="coerce").fillna(0)
-    x["buy_volume"] = size.where(side.eq("B"), 0)
-    x["sell_volume"] = size.where(side.eq("A"), 0)
-    x["unknown_volume"] = size.where(~side.isin(["A", "B"]), 0)
+    # Databento size may be an unsigned integer. Convert to signed int64 BEFORE
+    # aggregation/subtraction so sell-heavy minutes produce negative delta instead
+    # of wrapping around to huge positive values.
+    size = pd.to_numeric(x["size"], errors="coerce").fillna(0).astype("int64")
+    x["size_signed"] = size
+    x["buy_volume"] = size.where(side.eq("B"), 0).astype("int64")
+    x["sell_volume"] = size.where(side.eq("A"), 0).astype("int64")
+    x["unknown_volume"] = size.where(~side.isin(["A", "B"]), 0).astype("int64")
     m = x.groupby("minute_utc", as_index=False).agg(
         buy_volume=("buy_volume", "sum"),
         sell_volume=("sell_volume", "sum"),
         unknown_volume=("unknown_volume", "sum"),
-        trade_records=("size", "size"),
+        trade_records=("size_signed", "size"),
     )
-    m["delta"] = m.buy_volume - m.sell_volume
+    for c in ["buy_volume", "sell_volume", "unknown_volume", "trade_records"]:
+        m[c] = m[c].astype("int64")
+    m["delta"] = m["buy_volume"].astype("int64") - m["sell_volume"].astype("int64")
     return m
 
 
@@ -50,13 +56,17 @@ def consolidate(minute_files, out_path):
     if not parts:
         return None
     allm = pd.concat(parts, ignore_index=True)
+    for c in ["buy_volume", "sell_volume", "unknown_volume", "trade_records"]:
+        allm[c] = pd.to_numeric(allm[c], errors="coerce").fillna(0).astype("int64")
     out = allm.groupby("minute_utc", as_index=False).agg(
         buy_volume=("buy_volume", "sum"),
         sell_volume=("sell_volume", "sum"),
         unknown_volume=("unknown_volume", "sum"),
         trade_records=("trade_records", "sum"),
     ).sort_values("minute_utc")
-    out["delta"] = out.buy_volume - out.sell_volume
+    for c in ["buy_volume", "sell_volume", "unknown_volume", "trade_records"]:
+        out[c] = out[c].astype("int64")
+    out["delta"] = out["buy_volume"] - out["sell_volume"]
     out.to_parquet(out_path, index=False)
     csv_path = out_path.with_suffix(".csv")
     out.to_csv(csv_path, index=False)
@@ -116,7 +126,6 @@ def main():
 
     for idx, r in selected.iterrows():
         year = int(r.year)
-        # Planner timestamps are New York aware. Databento accepts UTC ISO timestamps.
         start_utc = pd.Timestamp(r.exact_start_et).tz_convert("UTC")
         end_utc = pd.Timestamp(r.exact_end_et).tz_convert("UTC")
         stem = safe_name(year, idx, start_utc, end_utc)
@@ -150,7 +159,6 @@ def main():
                     end=end_utc.isoformat(),
                 )
                 df = data.to_df().reset_index()
-                # Preserve the paid trade-level data locally so later analysis never needs to repurchase it.
                 keep = [c for c in ["ts_recv", "ts_event", "instrument_id", "action", "side", "price", "size", "sequence", "symbol"] if c in df.columns]
                 df = df[keep].copy()
                 df.to_parquet(raw_path, index=False)
