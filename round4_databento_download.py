@@ -14,6 +14,12 @@ def safe_name(symbol):
     return symbol.replace(".", "_")
 
 
+def unavailable_by_design(symbol, year):
+    # CME's current E-mini Russell 2000 futures (RTY) launched in July 2017,
+    # so a 2016 continuous RTY series does not exist in GLBX.MDP3.
+    return symbol == "RTY.v.0" and year < 2017
+
+
 def main():
     ap = argparse.ArgumentParser(
         description="Download Round 4 cross-market OHLCV only after reviewing round4_databento_cost.py output."
@@ -49,6 +55,12 @@ def main():
     for symbol in args.symbols:
         for year in args.years:
             path = OUTDIR / f"{safe_name(symbol)}_{year}.csv.gz"
+
+            if unavailable_by_design(symbol, year):
+                print("SKIP unavailable by design", symbol, year)
+                manifest.append((symbol, year, str(path), "unavailable_by_design"))
+                continue
+
             if path.exists() and path.stat().st_size > 0:
                 print("SKIP cached", path)
                 manifest.append((symbol, year, str(path), "cached"))
