@@ -1,0 +1,30 @@
+name: Strategy Tournament Round 1
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'strategy_tournament_round1.py'
+      - '.github/workflows/strategy-tournament.yml'
+  workflow_dispatch:
+
+jobs:
+  tournament:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pandas numpy requests
+      - name: Run frozen 2021-2023 tournament
+        run: python strategy_tournament_round1.py
+      - name: Upload tournament outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: strategy-tournament-round1
+          path: |
+            strategy_tournament_round1_trades.csv
+            strategy_tournament_round1_leaderboard.csv
