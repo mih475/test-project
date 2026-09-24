@@ -1,0 +1,32 @@
+name: Round 3 Literature Tournament
+on:
+  push:
+    paths:
+      - 'round3_literature_tournament.py'
+      - 'round3_step1_frozen_spec.md'
+      - '.github/workflows/round3-literature-tournament.yml'
+  workflow_dispatch:
+jobs:
+  tournament:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pandas numpy requests
+      - name: Run frozen 2016-2023 Round 3 tournament
+        run: python round3_literature_tournament.py
+      - name: Upload Round 3 outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: round3-literature-tournament
+          path: |
+            round3_literature_trades.csv
+            round3_literature_leaderboard.csv
+            round3_literature_year_by_year.csv
+            round3_literature_cost_sensitivity.csv
+            round3_gap_horizon_trades.csv
+            round3_gap_horizon_profile.csv
