@@ -1,0 +1,29 @@
+name: S1 Holdout 2025
+
+on:
+  push:
+    paths:
+      - 's1_holdout_2025.py'
+      - '.github/workflows/s1-holdout-2025.yml'
+  workflow_dispatch:
+
+jobs:
+  holdout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pandas numpy requests
+      - name: Run frozen S1 2025 holdout
+        run: python s1_holdout_2025.py
+      - name: Upload holdout outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: s1-holdout-2025
+          path: |
+            s1_holdout_2025_trades.csv
+            s1_holdout_2025_costs.csv
