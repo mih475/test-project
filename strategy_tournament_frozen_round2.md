@@ -81,13 +81,14 @@ Hypothesis: prior-day extremes act as auction reference levels; acceptance throu
 ## R2S5 — ADX/VWAP/EMA20 trend pullback
 Status: source-inspired mechanical translation.
 Source: https://www.reddit.com/r/Daytrading/comments/1rv0vci/hows_my_strategy/
+Pre-test implementation note: standard ADX(14) on RTH-only 15m bars would not mature until almost the cash close. Because the source describes index futures without specifying a 09:30 indicator reset, ADX and EMA are calculated on same-contract ETH bars; VWAP remains NY RTH session VWAP.
 Rules:
-1. RTH 15m ADX(14) must be 25-35 inclusive and rising versus previous completed 15m bar.
-2. RTH 5m ADX(14) must be rising versus previous completed 5m bar.
-3. Use RTH session VWAP and 5m EMA20.
-4. Search 10:30-15:00.
-5. Long trend condition: 5m close > VWAP, EMA20 > VWAP. Pullback candle must trade at/below EMA20 and close back above EMA20.
-6. Short mirror: close < VWAP, EMA20 < VWAP; candle trades at/above EMA20 and closes below it.
+1. Same-contract ETH 15m ADX(14) must be 25-35 inclusive and rising versus previous completed 15m bar.
+2. Same-contract ETH 5m ADX(14) must be rising versus previous completed 5m bar.
+3. Use ETH 5m EMA20 and NY RTH session VWAP.
+4. Search RTH 10:30-15:00.
+5. Long trend condition: completed 5m close > RTH VWAP and EMA20 > RTH VWAP. Pullback candle must trade at/below EMA20 and close back above EMA20.
+6. Short mirror: close < RTH VWAP, EMA20 < RTH VWAP; candle trades at/above EMA20 and closes below it.
 7. Enter next 5m open.
 8. Stop 1 tick beyond pullback candle extreme.
 9. Target 2R.
