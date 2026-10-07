@@ -1,0 +1,25 @@
+name: ORB 15 vs 30 verification
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'orb_15v30_verify.py'
+      - '.github/workflows/orb-15v30.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests
+      - run: python orb_15v30_verify.py | tee orb_15v30_results.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orb-15v30-results
+          path: |
+            orb_15v30_results.txt
+            orb_15v30_summary.csv
+            orb_15v30_trades.csv
