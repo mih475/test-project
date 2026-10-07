@@ -1,0 +1,33 @@
+name: ORB refinement stage 2
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'orb_refinement_stage2.py'
+      - '.github/workflows/orb-refinement-stage2.yml'
+  workflow_dispatch:
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests tabulate
+      - run: python orb_refinement_stage2.py | tee orb_refinement_stage2_log.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orb-refinement-stage2-results
+          path: |
+            orb_refinement_stage2_log.txt
+            orb_refinement_stage2_result.md
+            orb_refinement_stageA.csv
+            orb_refinement_stageB.csv
+            orb_refinement_frozen_candidates.csv
+            orb_refinement_validation_2021_2023.csv
+            orb_refinement_selection.csv
+            orb_refinement_confirmation_2024_2025.csv
+            orb_refinement_latest_2026.csv
+            orb_refinement_winner_all_trades.csv
