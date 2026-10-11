@@ -1,0 +1,32 @@
+name: ORB walk-forward regime test
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'orb_walkforward_regime.py'
+      - '.github/workflows/orb-walkforward-regime.yml'
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests tabulate
+      - run: python orb_walkforward_regime.py | tee orb_walkforward_regime_log.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orb-walkforward-regime-results
+          path: |
+            orb_walkforward_regime_log.txt
+            orb_wf_trade_features.csv
+            orb_wf_fixed_variants_by_year.csv
+            orb_wf_selector_by_year.csv
+            orb_wf_selected_oos_trades.csv
+            orb_wf_friction.csv
+            orb_wf_monte_carlo_samples.csv
+            orb_wf_monte_carlo_summary.csv
+            orb_wf_variant_blocks.csv
