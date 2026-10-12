@@ -1,0 +1,46 @@
+{
+  "ES_1min_2016.csv": {
+    "bytes": 25041790,
+    "sha256": "b0092ef73eb59d7d2c549abcdac3a72bd04647e9526ca8f7916f0538e8a12d04"
+  },
+  "ES_1min_2017.csv": {
+    "bytes": 24723802,
+    "sha256": "940ea0667693e7df6ce5943ffaa5bb4f57432490357c69c88d200bc65ff83293"
+  },
+  "ES_1min_2018.csv": {
+    "bytes": 25010445,
+    "sha256": "0e0611ddbd38e82d31e898de2d48307a48e92a434d8511d1d9176cf267d45156"
+  },
+  "ES_1min_2019.csv": {
+    "bytes": 25037341,
+    "sha256": "d7072480126f15acd7a254bd6fc71cf5ab3a4dbc267c536e8b1593739e8d4f04"
+  },
+  "ES_1min_2020.csv": {
+    "bytes": 25127170,
+    "sha256": "989cae1808b87438b3b0b632e9f01f2067e0cd24a262f8028bc467e82addd3f3"
+  },
+  "ES_1min_2021.csv": {
+    "bytes": 25340916,
+    "sha256": "a79a23b00c52fd9f153442dde489b0acb261dce4c2d26ae3c3d06486fe761021"
+  },
+  "ES_1min_2022.csv": {
+    "bytes": 25446124,
+    "sha256": "53dc6055e9e6d5edc962ba1b6f12bcb9ea9677e183c9b9a996d55417098c3bc2"
+  },
+  "ES_1min_2023.csv": {
+    "bytes": 25394718,
+    "sha256": "cc8d53b3a306d6b8171e6dc7c67954e6f13ac28f413cf4de6b0e237582165429"
+  },
+  "ES_1min_2024.csv": {
+    "bytes": 25445732,
+    "sha256": "61d928ede2f01fc959c7d16d589c4d0b133f14f9948e64af9c28497ab75f92fc"
+  },
+  "ES_1min_2025.csv": {
+    "bytes": 25191394,
+    "sha256": "9df0a08da4a03285bd3f23f4db4f3e969dbad57b17228ded4a881be2b0e1cd96"
+  },
+  "ES_1min_2026.csv": {
+    "bytes": 11321310,
+    "sha256": "df681abb0f807aa900fe435034fd0652bf0126cae198bff43bb6f837ee14326b"
+  }
+}
