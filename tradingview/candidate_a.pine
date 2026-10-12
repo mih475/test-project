@@ -12,7 +12,6 @@ const string RTH = "0930-1600:23456"
 const int EMA_LEN = 50
 const int ATR_LEN = 7
 const float TARGET_ATR = 1.5
-const float MIN_TICK = 0.25
 
 if barstate.isfirst and (not timeframe.isminutes or timeframe.multiplier != 15)
     runtime.error("Frozen Candidate A requires a 15-minute chart.")
@@ -112,7 +111,7 @@ if openingBar
 
 bool longSignal = barstate.isconfirmed and eligibleSignalBar and not na(orHigh) and
      not tradedToday and strategy.position_size == 0 and close > orHigh and close > ema50Rth and
-     not na(atr7Rth) and atr7Rth >= MIN_TICK
+     not na(atr7Rth)
 if longSignal
     tradedToday := true
     signalAtr := atr7Rth
