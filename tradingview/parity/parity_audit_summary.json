@@ -1,0 +1,45 @@
+{
+  "archived_rows": 2404,
+  "reproduction": {
+    "row_count": true,
+    "entry": true,
+    "stop": true,
+    "target": true,
+    "atr": true,
+    "risk_pts": true,
+    "raw_pnl_pts": true,
+    "adx14": true,
+    "signal_time": true,
+    "entry_time": true,
+    "exit_time": true,
+    "direction": true,
+    "exit_reason": true
+  },
+  "input_start": "2016-01-04 09:30:00-05:00",
+  "input_end": "2026-06-11 15:59:00-04:00",
+  "data_product": "ES; MES cost model only",
+  "candidates": {
+    "A": {
+      "research_trades": 1393,
+      "first_qualifying_long_same_cutoff": 1630,
+      "frozen_rules_trades": 1657,
+      "changed_sessions": 264,
+      "added_sessions": 264,
+      "removed_sessions": 0,
+      "different_signal_on_shared_session": 0,
+      "invalid_risk": 0,
+      "below_legacy_atr_min": 0
+    },
+    "B": {
+      "research_trades": 763,
+      "first_qualifying_long_same_cutoff": 1198,
+      "frozen_rules_trades": 1221,
+      "changed_sessions": 458,
+      "added_sessions": 458,
+      "removed_sessions": 0,
+      "different_signal_on_shared_session": 0,
+      "invalid_risk": 0,
+      "below_legacy_atr_min": 0
+    }
+  }
+}
