@@ -1,5 +1,13 @@
 # MES ORB TradingView forward test
 
+## Current setup status (2026-10-12)
+
+- Candidate A and Candidate B were saved as separate private TradingView Pine strategies and added to the `CME_MINI:MES1!` 15-minute chart, set to the New York timezone.
+- The TradingView editor code was checked against the local Pine files. The unapproved ATR minimum-tick filter was removed from both implementations.
+- The Trading Panel is not connected to Paper Trading. TradingView reports the current account session was disconnected after access from another browser/device; its Connect action may take over the single active market-data session. Do not reconnect until the user confirms that taking over the other session is acceptable.
+- Alerts remain uncreated until the candle-for-candle parity gate passes. No paper or live orders have been placed. Do not count forward-test sessions yet.
+- TradingView's current plan reports that higher-detail Bar Magnifier data requires Premium, so emulator exit-fill parity remains an open limitation.
+
 ## Frozen candidates
 
 - **A:** 15-minute MES, RTH 09:30–16:00 America/New_York, 09:30–09:45 opening range; long only; a completed 15-minute close strictly above the OR high and EMA50; ATR(7); enter at the next 15-minute open; target entry + 1.5 × signal-bar ATR(7); stop at OR low; one entry per session; exit at stop, target, or the 15:45–16:00 RTH candle close.
