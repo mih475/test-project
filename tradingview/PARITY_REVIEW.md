@@ -4,6 +4,10 @@
 
 The Pine implementations are written from the user-approved frozen rules. They are not yet verified candle-for-candle against the historical research output. Do not start counting forward-test sessions until this review is resolved and the same-data comparison passes.
 
+TradingView setup progress (2026-10-12): Candidate A and Candidate B were copied into separate private Pine strategies, added to the `CME_MINI:MES1!` 15-minute chart, and their editor text was checked against the frozen source. An implementation-only ATR minimum-tick filter was removed from both Pine versions because it is absent from the frozen specification. The chart timezone is New York. No alert has been created and no paper or live order was placed.
+
+TradingView currently reports that higher-detail Bar Magnifier data requires Premium. Its Trading panel also reports that this account session was disconnected after access from another browser/device; reconnecting may take over the single active market-data session. Paper Trading is not connected. These setup limits do not change the parity gate below.
+
 ## Confirmed mismatch in current Python variant path
 
 The current repository's orb_walkforward_regime.py builds one baseline trade per session with orb_refinement_stage2.signal_for(). That signal function scans for the first breakout in either direction, long or short. The LONG_ONLY and LONG_ADX20_DMI variants then filter the resulting completed baseline trade.
