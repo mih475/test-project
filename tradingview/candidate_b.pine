@@ -1,0 +1,131 @@
+//@version=6
+strategy("Frozen MES ORB Candidate B — Paper", overlay=true, pyramiding=0,
+     default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=0.75,
+     slippage=0, process_orders_on_close=false, calc_on_order_fills=true,
+     calc_on_every_tick=false, use_bar_magnifier=true)
+
+// Frozen Candidate B: Candidate A plus ADX(14) >= 20 and +DI(14) > -DI(14).
+const string TZ = "America/New_York"
+const string RTH = "0930-1600:23456"
+const int EMA_LEN = 50
+const int ATR_LEN = 7
+const float TARGET_ATR = 1.5
+const float MIN_TICK = 0.25
+if barstate.isfirst and (not timeframe.isminutes or timeframe.multiplier != 15)
+    runtime.error("Frozen Candidate B requires a 15-minute chart.")
+
+bool inRth = not na(time(timeframe.period, RTH, TZ))
+int dateKey = year(time, TZ) * 10000 + month(time, TZ) * 100 + dayofmonth(time, TZ)
+bool newSession = inRth and (na(dateKey[1]) or dateKey != dateKey[1])
+bool openingBar = inRth and hour(time, TZ) == 9 and minute(time, TZ) == 30
+bool eligibleSignalBar = inRth and hour(time, TZ) * 60 + minute(time, TZ) >= 9 * 60 + 45 and
+     hour(time, TZ) * 60 + minute(time, TZ) < 15 * 60 + 30
+bool finalRthBar = inRth and hour(time, TZ) == 15 and minute(time, TZ) == 45
+
+var int rthCount = 0
+var float ema50Rth = na
+var float prevRthClose = na
+var float prevRthHigh = na
+var float prevRthLow = na
+var float atr7Seed = 0.0
+var float atr7Rth = na
+var float atr14Seed = 0.0
+var float atr14Rth = na
+var float plusSeed = 0.0
+var float minusSeed = 0.0
+var float plusRma = na
+var float minusRma = na
+var float adxSeed = 0.0
+var int adxSeedCount = 0
+var float adx14Rth = na
+var float plusDi14 = na
+var float minusDi14 = na
+if inRth
+    rthCount += 1
+    float tr = na(prevRthClose) ? high - low :
+         math.max(high - low, math.max(math.abs(high - prevRthClose), math.abs(low - prevRthClose)))
+    float upMove = na(prevRthHigh) ? 0.0 : high - prevRthHigh
+    float downMove = na(prevRthLow) ? 0.0 : prevRthLow - low
+    float pdm = upMove > downMove and upMove > 0 ? upMove : 0.0
+    float mdm = downMove > upMove and downMove > 0 ? downMove : 0.0
+    ema50Rth := na(ema50Rth) ? close : ema50Rth + (2.0 / (EMA_LEN + 1.0)) * (close - ema50Rth)
+    if rthCount <= ATR_LEN
+        atr7Seed += tr
+        if rthCount == ATR_LEN
+            atr7Rth := atr7Seed / ATR_LEN
+    else
+        atr7Rth := (atr7Rth * (ATR_LEN - 1) + tr) / ATR_LEN
+    if rthCount <= 14
+        atr14Seed += tr
+        plusSeed += pdm
+        minusSeed += mdm
+        if rthCount == 14
+            atr14Rth := atr14Seed / 14.0
+            plusRma := plusSeed / 14.0
+            minusRma := minusSeed / 14.0
+    else
+        atr14Rth := (atr14Rth * 13.0 + tr) / 14.0
+        plusRma := (plusRma * 13.0 + pdm) / 14.0
+        minusRma := (minusRma * 13.0 + mdm) / 14.0
+    if not na(atr14Rth) and atr14Rth > 0
+        plusDi14 := 100.0 * plusRma / atr14Rth
+        minusDi14 := 100.0 * minusRma / atr14Rth
+    else
+        plusDi14 := na
+        minusDi14 := na
+    float diSum = plusDi14 + minusDi14
+    float dx = not na(diSum) and diSum > 0 ? 100.0 * math.abs(plusDi14 - minusDi14) / diSum : na
+    if rthCount <= 14
+        if not na(dx)
+            adxSeed += dx
+            adxSeedCount += 1
+        if rthCount == 14 and adxSeedCount > 0
+            adx14Rth := adxSeed / adxSeedCount
+    else if not na(dx) and not na(adx14Rth)
+        adx14Rth := (adx14Rth * 13.0 + dx) / 14.0
+    prevRthClose := close
+    prevRthHigh := high
+    prevRthLow := low
+
+var float orHigh = na
+var float orLow = na
+var float signalAtr = na
+var float stopPrice = na
+var bool tradedToday = false
+if newSession
+    orHigh := na
+    orLow := na
+    signalAtr := na
+    stopPrice := na
+    tradedToday := false
+if openingBar
+    orHigh := high
+    orLow := low
+
+bool longSignal = barstate.isconfirmed and eligibleSignalBar and not na(orHigh) and
+     not tradedToday and strategy.position_size == 0 and close > orHigh and close > ema50Rth and
+     not na(atr7Rth) and atr7Rth >= MIN_TICK and not na(adx14Rth) and adx14Rth >= 20.0 and
+     not na(plusDi14) and not na(minusDi14) and plusDi14 > minusDi14
+if longSignal
+    tradedToday := true
+    signalAtr := atr7Rth
+    stopPrice := orLow
+    strategy.entry("B-L", strategy.long, qty=1,
+         alert_message="B_ENTRY_FILL|{{ticker}}|{{strategy.order.price}}|{{time}}")
+if strategy.position_size > 0 and not na(signalAtr) and not na(stopPrice)
+    float targetPrice = strategy.position_avg_price + TARGET_ATR * signalAtr
+    strategy.exit("B-X", from_entry="B-L", stop=stopPrice, limit=targetPrice,
+         alert_message="B_BRACKET_EXIT|{{ticker}}|{{strategy.order.price}}|{{time}}")
+if strategy.position_size > 0 and finalRthBar
+    strategy.close("B-L", comment="RTH close", immediately=true,
+         alert_message="B_RTH_CLOSE|{{ticker}}|{{strategy.order.price}}|{{time}}")
+
+plot(orHigh, "Parity OR high", color=color.new(color.green, 55), style=plot.style_linebr)
+plot(orLow, "Parity OR low / stop", color=color.new(color.red, 55), style=plot.style_linebr)
+plot(ema50Rth, "Python-style RTH EMA50", color=color.new(color.orange, 0), display=display.data_window)
+plot(atr7Rth, "Python-style RTH ATR7", color=color.new(color.blue, 0), display=display.data_window)
+plot(adx14Rth, "Python-style RTH ADX14", color=color.new(color.purple, 0), display=display.data_window)
+plot(plusDi14, "Python-style RTH +DI14", color=color.new(color.teal, 0), display=display.data_window)
+plot(minusDi14, "Python-style RTH -DI14", color=color.new(color.red, 0), display=display.data_window)
+plot(longSignal ? 1 : 0, "Parity long signal (1/0)", display=display.data_window)
