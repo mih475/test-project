@@ -6,7 +6,7 @@ The Pine implementations are written from the user-approved frozen rules. They a
 
 TradingView setup progress (2026-10-12): Candidate A and Candidate B were copied into separate private Pine strategies, added to the `CME_MINI:MES1!` 15-minute chart, and their editor text was checked against the frozen source. An implementation-only ATR minimum-tick filter was removed from both Pine versions because it is absent from the frozen specification. The chart timezone is New York. No alert has been created and no paper or live order was placed.
 
-TradingView currently reports that higher-detail Bar Magnifier data requires Premium. Its Trading panel also reports that this account session was disconnected after access from another browser/device; reconnecting may take over the single active market-data session. Paper Trading is not connected. These setup limits do not change the parity gate below.
+TradingView currently reports that higher-detail Bar Magnifier data requires Premium. Paper Trading was connected on 2026-10-12; its Orders tab showed no trading data and its Positions tab showed no open positions. No order was submitted. The parity gate remains open.
 
 ## Confirmed mismatch in current Python variant path
 
@@ -27,3 +27,22 @@ The research simulator checks RTH one-minute bars, gives the stop priority when 
 3. Compare every 15-minute signal candle, EMA50, ATR7, and (for B) ADX14/+DI14/−DI14 value. Compare entry dates and next-bar opens.
 4. Reconcile every exit using the original one-minute Python sequence and TradingView Bar Magnifier's available one-minute sequence. Record data-source and tie-break differences.
 5. Start the live paper log only after signal and indicator rows match and all remaining fill differences are classified.
+
+## Reproduction and frozen-rule audit (2026-10-12)
+
+Recovered GitHub Actions run 38119196219 and artifact 11694733532. The artifact ZIP SHA256 is 5efc7c1f22bf34542d53b4622343c929813042d444dbbeb7571a01cebac8f5bd. Downloaded the original ES one-minute source files for 2016–2026; cleaned coverage ends on 2026-06-11 at 15:59 ET. All 2,404 archived baseline trades reproduced, including direction, signal/entry/exit timestamps, entry/stop/target, ATR, ADX, risk, raw P&L, and exit reason (numeric tolerance 1e-10).
+
+| Candidate | Archived filtered trades | First qualifying long, research cutoff | First qualifying long, entry before 16:00 |
+| --- | ---: | ---: | ---: |
+| A | 1,393 | 1,630 | 1,657 |
+| B | 763 | 1,198 | 1,221 |
+
+The literal frozen-rule interpretation adds 264 sessions for A and 458 for B. Shared sessions retain the same signal timestamps. Lists are in parity/candidate_A_changed_sessions.csv and parity/candidate_B_changed_sessions.csv; summary and source SHA256 hashes are alongside them. No nonpositive entry-to-stop risks or ATR values below one tick occurred in the frozen candidate rows.
+
+The research cutoff excludes the 15:30–15:45 signal candle. That candle's next open is 15:45, still inside RTH, so the cutoff is an additional restriction absent from the user's specification. The current Pine files still use that research cutoff; correction and TradingView validation remain pending.
+
+The daily-reset correction is committed for both Pine files: entering RTH now resets state even when the previous chart bar is an ETH bar on the same date. A Python control-flow check over three sessions passed on both ETH and RTH-only timelines. This correction has not yet been installed or compiled in TradingView.
+
+These are Python reproduction and signal-rule checks on ES data, not Pine-versus-Python candle parity on MES. The audit inherits the research data-cleaning, indicator, missing-bar, and stop-first intrabar conventions. No alerts were activated and no forward-test sessions are counted.
+
+To reproduce: put the source ES_1min_YEAR.csv files in data/ at the repository root and extract the original workflow artifact into results/. Install pandas, numpy, and requests, then run python orb_frozen_parity_audit.py. The script refuses to continue if archived reproduction fails; it writes the frozen rows and changed-session reports at the repository root.
