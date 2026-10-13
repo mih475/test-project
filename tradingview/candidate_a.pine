@@ -1,9 +1,10 @@
 //@version=6
+//@strategy_alert_message {{strategy.order.alert_message}}|{{ticker}}|{{strategy.order.action}}|{{strategy.order.contracts}}|{{strategy.order.price}}|{{time}}|{{timenow}}
 strategy("Frozen MES ORB Candidate A — Paper", overlay=true, pyramiding=0,
      default_qty_type=strategy.fixed, default_qty_value=1,
      commission_type=strategy.commission.cash_per_contract, commission_value=0.75,
      slippage=0, process_orders_on_close=false, calc_on_order_fills=true,
-     calc_on_every_tick=false, use_bar_magnifier=true)
+     calc_on_every_tick=false, use_bar_magnifier=false, precision=8)
 
 // Frozen Candidate A. Apply to a 15-minute MES chart. Orders are TradingView
 // strategy-emulator orders; this script does not route orders to a live broker.
@@ -22,30 +23,43 @@ int dateKey = year(time, TZ) * 10000 + month(time, TZ) * 100 + dayofmonth(time, 
 bool newSession = inRth and (not inRth[1] or na(dateKey[1]) or dateKey != dateKey[1])
 bool openingBar = inRth and hour(time, TZ) == 9 and minute(time, TZ) == 30
 bool eligibleSignalBar = inRth and hour(time, TZ) * 60 + minute(time, TZ) >= 9 * 60 + 45 and
-     hour(time, TZ) * 60 + minute(time, TZ) < 15 * 60 + 30
+     hour(time, TZ) * 60 + minute(time, TZ) < 15 * 60 + 45
 bool finalRthBar = inRth and hour(time, TZ) == 15 and minute(time, TZ) == 45
 
 // Indicators update only on RTH bars, matching the Python RTH-only resample.
-var int rthCount = 0
-var float ema50Rth = na
-var float prevRthClose = na
-var float prevRthHigh = na
-var float prevRthLow = na
-var float atr7Seed = 0.0
-var float atr7Rth = na
-var float atr14Seed = 0.0
-var float atr14Rth = na
-var float plusSeed = 0.0
-var float minusSeed = 0.0
-var float plusRma = na
-var float minusRma = na
-var float adxSeed = 0.0
-var int adxSeedCount = 0
-var float adx14Rth = na
-var float plusDi14 = na
-var float minusDi14 = na
+// Fill callbacks manage the bracket only. They must not consume candle OHLC
+// or advance the recursive indicator state. varip preserves committed updates
+// across realtime fill callbacks; the bar-index guard prevents double updates.
+varip float previousExecutionPosition = 0.0
+varip int previousExecutionClosedTrades = 0
+varip int lastProcessedBar = na
+bool fillExecution = strategy.position_size != previousExecutionPosition or strategy.closedtrades != previousExecutionClosedTrades
+previousExecutionPosition := strategy.position_size
+previousExecutionClosedTrades := strategy.closedtrades
+bool processClose = barstate.isconfirmed and not fillExecution and (na(lastProcessedBar) or lastProcessedBar != bar_index)
+if processClose
+    lastProcessedBar := bar_index
 
-if inRth
+varip int rthCount = 0
+varip float ema50Rth = na
+varip float prevRthClose = na
+varip float prevRthHigh = na
+varip float prevRthLow = na
+varip float atr7Seed = 0.0
+varip float atr7Rth = na
+varip float atr14Seed = 0.0
+varip float atr14Rth = na
+varip float plusSeed = 0.0
+varip float minusSeed = 0.0
+varip float plusRma = na
+varip float minusRma = na
+varip float adxSeed = 0.0
+varip int adxSeedCount = 0
+varip float adx14Rth = na
+varip float plusDi14 = na
+varip float minusDi14 = na
+
+if processClose and inRth
     rthCount += 1
     float tr = na(prevRthClose) ? high - low :
          math.max(high - low, math.max(math.abs(high - prevRthClose), math.abs(low - prevRthClose)))
@@ -95,41 +109,47 @@ if inRth
     prevRthHigh := high
     prevRthLow := low
 
-var float orHigh = na
-var float orLow = na
-var float signalAtr = na
-var float stopPrice = na
-var bool tradedToday = false
-if newSession
+varip float orHigh = na
+varip float orLow = na
+varip float signalAtr = na
+varip float stopPrice = na
+varip bool tradedToday = false
+varip int lastSignalBar = na
+if processClose and newSession
     orHigh := na
     orLow := na
     signalAtr := na
     stopPrice := na
     tradedToday := false
-if openingBar
+if processClose and openingBar
     orHigh := high
     orLow := low
 
-bool longSignal = barstate.isconfirmed and eligibleSignalBar and not na(orHigh) and
+bool longSignal = processClose and eligibleSignalBar and not na(orHigh) and
      not tradedToday and strategy.position_size == 0 and close > orHigh and close > ema50Rth and
      not na(atr7Rth)
 if longSignal
+    lastSignalBar := bar_index
     tradedToday := true
     signalAtr := atr7Rth
     stopPrice := orLow
     strategy.entry("A-L", strategy.long, qty=1,
-         alert_message="A_ENTRY_FILL|{{ticker}}|{{strategy.order.price}}|{{time}}")
+         alert_message="A_ENTRY_FILL")
 
 if strategy.position_size > 0 and not na(signalAtr) and not na(stopPrice)
     float targetPrice = strategy.position_avg_price + TARGET_ATR * signalAtr
     strategy.exit("A-X", from_entry="A-L", stop=stopPrice, limit=targetPrice,
-         alert_message="A_BRACKET_EXIT|{{ticker}}|{{strategy.order.price}}|{{time}}")
-if strategy.position_size > 0 and finalRthBar
+         alert_message="A_BRACKET_EXIT")
+if processClose and strategy.position_size > 0 and finalRthBar
     strategy.close("A-L", comment="RTH close", immediately=true,
-         alert_message="A_RTH_CLOSE|{{ticker}}|{{strategy.order.price}}|{{time}}")
+         alert_message="A_RTH_CLOSE")
 
 plot(orHigh, "Parity OR high", color=color.new(color.green, 55), style=plot.style_linebr)
 plot(orLow, "Parity OR low / stop", color=color.new(color.red, 55), style=plot.style_linebr)
 plot(ema50Rth, "Python-style RTH EMA50", color=color.new(color.orange, 0), display=display.data_window)
 plot(atr7Rth, "Python-style RTH ATR7", color=color.new(color.blue, 0), display=display.data_window)
-plot(longSignal ? 1 : 0, "Parity long signal (1/0)", display=display.data_window)
+plot(lastSignalBar == bar_index ? 1 : 0, "Parity long signal (1/0)", display=display.data_window)
+
+plot(rthCount, "Parity RTH bar count", display=display.data_window)
+plot(strategy.position_size > 0 ? strategy.position_avg_price + TARGET_ATR * signalAtr : na, "Parity target", display=display.data_window)
+plot(signalAtr, "Parity captured ATR", display=display.data_window)
