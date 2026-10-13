@@ -1,5 +1,5 @@
 //@version=6
-//@strategy_alert_message {{strategy.order.alert_message}}|{{ticker}}|{{strategy.order.action}}|{{strategy.order.contracts}}|{{strategy.order.price}}|{{time}}|{{timenow}}
+//@strategy_alert_message {"kind":"fill","data":{{strategy.order.alert_message}},"ticker":"{{ticker}}","action":"{{strategy.order.action}}","contracts":{{strategy.order.contracts}},"fill_price":{{strategy.order.price}},"bar_time":"{{time}}","alert_time":"{{timenow}}"}
 strategy("Frozen MES ORB Candidate A — Paper", overlay=true, pyramiding=0,
      default_qty_type=strategy.fixed, default_qty_value=1,
      commission_type=strategy.commission.cash_per_contract, commission_value=0.75,
@@ -137,6 +137,17 @@ varip float signalAtr = na
 varip float stopPrice = na
 varip bool tradedToday = false
 varip int lastSignalBar = na
+varip int capturedSignalTime = na
+varip float capturedSignalClose = na
+varip float capturedEma = na
+varip float capturedAdx = na
+varip float capturedPlusDi = na
+varip float capturedMinusDi = na
+f_num(float x) =>
+    na(x) ? "null" : str.tostring(x, "#.########")
+f_event(string event) =>
+    '{"candidate":"A","event":"' + event + '","source":"TradingView MES strategy emulator","symbol":"' + syminfo.tickerid + '","signal_time_ms":' + str.tostring(capturedSignalTime) + ',"signal_close":' + f_num(capturedSignalClose) + ',"or_high":' + f_num(orHigh) + ',"or_low":' + f_num(stopPrice) + ',"ema50":' + f_num(capturedEma) + ',"atr7":' + f_num(signalAtr) + ',"adx14":' + f_num(capturedAdx) + ',"adx_margin_20":' + f_num(capturedAdx - 20.0) + ',"plus_di14":' + f_num(capturedPlusDi) + ',"minus_di14":' + f_num(capturedMinusDi) + ',"di_spread":' + f_num(capturedPlusDi - capturedMinusDi) + ',"tag":"' + (not na(capturedAdx) and math.abs(capturedAdx - 20.0) <= 0.10 ? "near-threshold/feed-sensitive" : "") + '","target":' + f_num(strategy.position_size > 0 ? strategy.position_avg_price + TARGET_ATR * signalAtr : na) + '}'
+
 if processClose and newSession
     orHigh := na
     orLow := na
@@ -155,16 +166,21 @@ if longSignal
     tradedToday := true
     signalAtr := atr7Rth
     stopPrice := orLow
+    capturedSignalTime := time
+    capturedSignalClose := close
+    capturedEma := ema50Rth
+    alert(f_event("SIGNAL"), alert.freq_once_per_bar_close)
     strategy.entry("A-L", strategy.long, qty=1,
-         alert_message="A_ENTRY_FILL")
+         alert_message=f_event("ENTRY_FILL"))
 
 if strategy.position_size > 0 and not na(signalAtr) and not na(stopPrice)
     float targetPrice = strategy.position_avg_price + TARGET_ATR * signalAtr
     strategy.exit("A-X", from_entry="A-L", stop=stopPrice, limit=targetPrice,
-         alert_message="A_BRACKET_EXIT")
+         alert_message=f_event("BRACKET_EXIT"),
+         alert_profit=f_event("TARGET_EXIT"), alert_loss=f_event("STOP_EXIT"))
 if processClose and strategy.position_size > 0 and finalRthBar
     strategy.close("A-L", comment="RTH close", immediately=true,
-         alert_message="A_RTH_CLOSE")
+         alert_message=f_event("RTH_CLOSE"))
 
 plot(orHigh, "Parity OR high", color=color.new(color.green, 55), style=plot.style_linebr)
 plot(orLow, "Parity OR low / stop", color=color.new(color.red, 55), style=plot.style_linebr)
