@@ -1,0 +1,272 @@
+{
+  "requested_sessions": 10,
+  "observed_candles": 57,
+  "checks": {
+    "A_B_common_indicator_values": 56,
+    "OR_equals_opening_candle": 10,
+    "EMA50_python_recurrence": 25,
+    "ATR7_python_recurrence": 25,
+    "ADX14_python_recurrence": 25,
+    "one_RTH_indicator_update_per_bar": 25,
+    "signal_conditions": 16,
+    "captured_ATR_equals_signal_ATR": 16,
+    "signal_to_next_open": 16,
+    "target_entry_plus_1_5_signal_ATR": 14,
+    "shortened_session_no_signal": 4,
+    "target_touched_with_tick_rounding": 7,
+    "stop_touched": 4,
+    "RTH_close_final_bar_close": 5
+  },
+  "failures": [],
+  "exit_checks": [
+    {
+      "candidate": "A",
+      "entry": "2026-05-05 10:00:00",
+      "exit": "2026-05-05 14:00:00",
+      "exit_signal": "A-X",
+      "stop": 7264.25,
+      "target_unrounded": 7295.178174465,
+      "fill": 7295.25,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-05-06 10:00:00",
+      "exit": "2026-05-06 10:30:00",
+      "exit_signal": "A-X",
+      "stop": 7327.25,
+      "target_unrounded": 7367.552793545,
+      "fill": 7367.75,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-05-22 13:30:00",
+      "exit": "2026-05-22 15:15:00",
+      "exit_signal": "A-X",
+      "stop": 7491.0,
+      "target_unrounded": 7538.711240075,
+      "fill": 7491.0,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-06-01 11:45:00",
+      "exit": "2026-06-01 13:30:00",
+      "exit_signal": "A-X",
+      "stop": 7576.0,
+      "target_unrounded": 7616.59661383,
+      "fill": 7616.75,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-09-28 12:30:00",
+      "exit": "2026-09-28 12:30:00",
+      "exit_signal": "A-X",
+      "stop": 7758.75,
+      "target_unrounded": 7802.34418607,
+      "fill": 7758.75,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-10-06 10:00:00",
+      "exit": "2026-10-06 15:45:00",
+      "exit_signal": "RTH close",
+      "stop": 7860.25,
+      "target_unrounded": 7897.83858385,
+      "fill": 7873.0,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-10-07 12:15:00",
+      "exit": "2026-10-07 15:45:00",
+      "exit_signal": "RTH close",
+      "stop": 7822.0,
+      "target_unrounded": 7861.90849042,
+      "fill": 7851.25,
+      "both_touched": false
+    },
+    {
+      "candidate": "A",
+      "entry": "2026-10-09 11:00:00",
+      "exit": "2026-10-09 14:45:00",
+      "exit_signal": "A-X",
+      "stop": 7826.5,
+      "target_unrounded": 7866.010315605,
+      "fill": 7866.25,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-05-05 10:00:00",
+      "exit": "2026-05-05 14:00:00",
+      "exit_signal": "B-X",
+      "stop": 7264.25,
+      "target_unrounded": 7295.178174465,
+      "fill": 7295.25,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-05-06 10:00:00",
+      "exit": "2026-05-06 10:30:00",
+      "exit_signal": "B-X",
+      "stop": 7327.25,
+      "target_unrounded": 7367.552793545,
+      "fill": 7367.75,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-05-22 13:30:00",
+      "exit": "2026-05-22 15:15:00",
+      "exit_signal": "B-X",
+      "stop": 7491.0,
+      "target_unrounded": 7538.711240075,
+      "fill": 7491.0,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-06-01 14:15:00",
+      "exit": "2026-06-01 15:45:00",
+      "exit_signal": "RTH close",
+      "stop": 7576.0,
+      "target_unrounded": 7638.54635225,
+      "fill": 7613.75,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-09-28 12:30:00",
+      "exit": "2026-09-28 12:30:00",
+      "exit_signal": "B-X",
+      "stop": 7758.75,
+      "target_unrounded": 7802.34418607,
+      "fill": 7758.75,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-10-06 10:00:00",
+      "exit": "2026-10-06 15:45:00",
+      "exit_signal": "RTH close",
+      "stop": 7860.25,
+      "target_unrounded": 7897.83858385,
+      "fill": 7873.0,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-10-07 13:30:00",
+      "exit": "2026-10-07 15:45:00",
+      "exit_signal": "RTH close",
+      "stop": 7822.0,
+      "target_unrounded": 7866.875568005,
+      "fill": 7851.25,
+      "both_touched": false
+    },
+    {
+      "candidate": "B",
+      "entry": "2026-10-09 11:00:00",
+      "exit": "2026-10-09 14:45:00",
+      "exit_signal": "B-X",
+      "stop": 7826.5,
+      "target_unrounded": 7866.010315605,
+      "fill": 7866.25,
+      "both_touched": false
+    }
+  ],
+  "python_export_comparison": [
+    {
+      "candidate": "A",
+      "date": "2026-05-05",
+      "python_ES_entry": "2026-05-05 10:00:00-04:00",
+      "tradingview_MES_entry": "2026-05-05 10:00",
+      "python_ES_price": 7275.0,
+      "tradingview_MES_price": 7275.0
+    },
+    {
+      "candidate": "A",
+      "date": "2026-05-06",
+      "python_ES_entry": "2026-05-06 10:00:00-04:00",
+      "tradingview_MES_entry": "2026-05-06 10:00",
+      "python_ES_price": 7346.0,
+      "tradingview_MES_price": 7346.0
+    },
+    {
+      "candidate": "A",
+      "date": "2026-05-22",
+      "python_ES_entry": "2026-05-22 13:30:00-04:00",
+      "tradingview_MES_entry": "2026-05-22 13:30",
+      "python_ES_price": 7522.0,
+      "tradingview_MES_price": 7522.25
+    },
+    {
+      "candidate": "A",
+      "date": "2026-06-01",
+      "python_ES_entry": "2026-06-01 11:45:00-04:00",
+      "tradingview_MES_entry": "2026-06-01 11:45",
+      "python_ES_price": 7601.5,
+      "tradingview_MES_price": 7601.5
+    },
+    {
+      "candidate": "A",
+      "date": "2026-06-05",
+      "python_ES_entry": null,
+      "tradingview_MES_entry": null,
+      "python_ES_price": null,
+      "tradingview_MES_price": null
+    },
+    {
+      "candidate": "B",
+      "date": "2026-05-05",
+      "python_ES_entry": "2026-05-05 10:00:00-04:00",
+      "tradingview_MES_entry": "2026-05-05 10:00",
+      "python_ES_price": 7275.0,
+      "tradingview_MES_price": 7275.0
+    },
+    {
+      "candidate": "B",
+      "date": "2026-05-06",
+      "python_ES_entry": "2026-05-06 10:00:00-04:00",
+      "tradingview_MES_entry": "2026-05-06 10:00",
+      "python_ES_price": 7346.0,
+      "tradingview_MES_price": 7346.0
+    },
+    {
+      "candidate": "B",
+      "date": "2026-05-22",
+      "python_ES_entry": "2026-05-22 13:30:00-04:00",
+      "tradingview_MES_entry": "2026-05-22 13:30",
+      "python_ES_price": 7522.0,
+      "tradingview_MES_price": 7522.25
+    },
+    {
+      "candidate": "B",
+      "date": "2026-06-01",
+      "python_ES_entry": "2026-06-01 14:30:00-04:00",
+      "tradingview_MES_entry": "2026-06-01 14:15",
+      "python_ES_price": 7627.25,
+      "tradingview_MES_price": 7622.75
+    },
+    {
+      "candidate": "B",
+      "date": "2026-06-05",
+      "python_ES_entry": null,
+      "tradingview_MES_entry": null,
+      "python_ES_price": null,
+      "tradingview_MES_price": null
+    }
+  ],
+  "limitations": [
+    "UI sample recurrence checks are seeded from the preceding observed Pine value; complete indicator seed/history parity is unverified.",
+    "DI values/filter observed; independent DI14 numeric parity needs identical source history and ATR14 state.",
+    "Original Python exports use ES feed; TradingView uses MES. Full same-feed parity and one-minute exit sequencing cannot be established.",
+    "Chart export and Bar Magnifier blocked by Essential plan."
+  ],
+  "status": "sample_checked_full_parity_unverified"
+}
