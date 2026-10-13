@@ -18,7 +18,7 @@ The Python trade builder also drops a trade if entry-to-stop risk is under one t
 
 ## Exit-resolution limitation
 
-The research simulator checks RTH one-minute bars, gives the stop priority when a one-minute candle touches both target and stop, and uses the final RTH one-minute close for an EOD exit. The Pine strategies use TradingView's strategy emulator on a 15-minute chart with Bar Magnifier enabled. Fills may differ because of symbol data, contract roll adjustment, intrabar coverage, stop gaps, or a same-minute stop/target collision.
+The research simulator checks RTH one-minute bars, gives the stop priority when a one-minute candle touches both target and stop, and uses the final RTH one-minute close for an EOD exit. The Pine strategies use TradingView's strategy emulator on a 15-minute chart with Bar Magnifier disabled on the current plan. Fills may differ because of symbol data, contract roll adjustment, intrabar coverage, stop gaps, or a same-minute stop/target collision.
 
 ## Required parity gate
 
@@ -39,10 +39,14 @@ Recovered GitHub Actions run 38119196219 and artifact 11694733532. The artifact 
 
 The literal frozen-rule interpretation adds 264 sessions for A and 458 for B. Shared sessions retain the same signal timestamps. Lists are in parity/candidate_A_changed_sessions.csv and parity/candidate_B_changed_sessions.csv; summary and source SHA256 hashes are alongside them. No nonpositive entry-to-stop risks or ATR values below one tick occurred in the frozen candidate rows.
 
-The research cutoff excludes the 15:30–15:45 signal candle. That candle's next open is 15:45, still inside RTH, so the cutoff is an additional restriction absent from the user's specification. The current Pine files still use that research cutoff; correction and TradingView validation remain pending.
+The research cutoff excludes the 15:30–15:45 signal candle. That candle's next open is 15:45, still inside RTH, so the cutoff is an additional restriction absent from the user's specification. The Pine cutoff now permits the 15:30 signal and 15:45 entry; same-data candle verification remains pending.
 
-The daily-reset correction is committed for both Pine files: entering RTH now resets state even when the previous chart bar is an ETH bar on the same date. A Python control-flow check over three sessions passed on both ETH and RTH-only timelines. This correction has not yet been installed or compiled in TradingView.
+The daily-reset correction is committed for both Pine files: entering RTH now resets state even when the previous chart bar is an ETH bar on the same date. A Python control-flow check over three sessions passed on both ETH and RTH-only timelines. This correction is now installed and compiled in TradingView, together with once-per-close indicator updates and fill-callback isolation.
 
 These are Python reproduction and signal-rule checks on ES data, not Pine-versus-Python candle parity on MES. The audit inherits the research data-cleaning, indicator, missing-bar, and stop-first intrabar conventions. No alerts were activated and no forward-test sessions are counted.
 
 To reproduce: put the source ES_1min_YEAR.csv files in data/ at the repository root and extract the original workflow artifact into results/. Install pandas, numpy, and requests, then run python orb_frozen_parity_audit.py. The script refuses to continue if archived reproduction fails; it writes the frozen rows and changed-session reports at the repository root.
+
+## Runtime checks completed
+
+See TRADINGVIEW_CHECKS.md. Both corrected strategies compile and run, but the no-overnight test fails on July 3, 2026. Alerts remain uncreated. Chart-data export is blocked by the Essential plan; trade-list export succeeded. No claim of complete candle parity is made.
