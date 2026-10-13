@@ -1,0 +1,50 @@
+{
+  "A": {
+    "closed_trades": 70,
+    "first_entry": "2026-05-01 11:15:00",
+    "last_entry": "2026-10-09 11:00:00",
+    "rth_close_exits": 18,
+    "checks": {
+      "all_long": true,
+      "one_contract": true,
+      "one_entry_per_day": true,
+      "entry_time_1000_through_1545": true,
+      "quarter_hour_entries": true,
+      "same_day_exit": false,
+      "roundtrip_commission_1_50": true,
+      "rth_close_on_final_bar": true
+    },
+    "overnight_exceptions": [
+      {
+        "trade_number": 32,
+        "entry": "2026-07-03 11:00:00",
+        "exit": "2026-07-05 18:00:00",
+        "exit_signal": "A-X"
+      }
+    ]
+  },
+  "B": {
+    "closed_trades": 58,
+    "first_entry": "2026-05-05 10:00:00",
+    "last_entry": "2026-10-09 11:00:00",
+    "rth_close_exits": 19,
+    "checks": {
+      "all_long": true,
+      "one_contract": true,
+      "one_entry_per_day": true,
+      "entry_time_1000_through_1545": true,
+      "quarter_hour_entries": true,
+      "same_day_exit": false,
+      "roundtrip_commission_1_50": true,
+      "rth_close_on_final_bar": true
+    },
+    "overnight_exceptions": [
+      {
+        "trade_number": 26,
+        "entry": "2026-07-03 11:00:00",
+        "exit": "2026-07-05 18:00:00",
+        "exit_signal": "B-X"
+      }
+    ]
+  }
+}
