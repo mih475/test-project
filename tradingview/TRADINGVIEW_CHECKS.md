@@ -1,6 +1,6 @@
 # TradingView checks — 2026-10-12 ET
 
-Status: blocked from forward-test activation. No alerts or orders submitted.
+Status: shortened-session failure resolved; full candle parity still blocks forward-test activation. No alerts or orders submitted.
 
 ## Installed and saved
 
@@ -27,3 +27,11 @@ The original research uses ES prices and MES costs, and its post-filtered long v
 ## Paper connection rechecked — October 12, 23:28 ET
 
 Paper Trading reconnected successfully. Balance/equity $100,000, realized/unrealized P&L $0; Positions showed no open positions and Orders/All showed no trading data. No order was submitted. Both strategies remain visible on the saved MES 15-minute layout.
+
+## Shortened-session exclusion approved and verified
+
+User approved skipping shortened sessions on October 12. Both saved Pine strategies now include the same predeclared 2026 calendar entry gate. Indicators still consume available RTH bars. No future-bar inspection is used. See HOLIDAY_CALENDAR.md for dates, coverage and review requirements.
+
+Updated TradingView exports contain 67 A trades and 56 B trades. All structural checks pass, including same-day exits, long-only, one contract, maximum one entry per day and entry times. There are no overnight exceptions in this exported sample. A removed May 25, June 19 and July 3; B removed May 25 and July 3. Every remaining trade's entry/exit timestamps, prices, size, net P&L, commission and duration matches the corresponding pre-exclusion export exactly. Original failed checks are preserved; new evidence is in checks/after_calendar/.
+
+Both updated chart scripts compile without runtime errors and the layout was saved. The complete candle/indicator comparison remains blocked by chart-data export access. These checks do not establish full parity or future profitability. Alerts remain off; no paper or live orders were submitted.
