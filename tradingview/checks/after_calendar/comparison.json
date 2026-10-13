@@ -1,0 +1,19 @@
+{
+  "A": {
+    "removed_dates": [
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03"
+    ],
+    "remaining_trade_rows_identical": true,
+    "all_structural_checks_pass": true
+  },
+  "B": {
+    "removed_dates": [
+      "2026-05-25",
+      "2026-07-03"
+    ],
+    "remaining_trade_rows_identical": true,
+    "all_structural_checks_pass": true
+  }
+}
