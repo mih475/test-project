@@ -11,3 +11,5 @@ TradingView's server alert log is the automatic event record. SIGNAL calls recor
 Emulator zero modeled slippage does not imply executable market fills. Target prices can round to ticks. MFE/MAE and R come from matching post-start trade exports and captured initial stop risk; missing values remain blank. Full same-feed historical initialization and one-minute intrabar parity remain limitations accepted for diagnostic observation.
 
 No real or paper-account orders were submitted. Rules and shortened-session exclusions remain frozen. Calendar reviewed for 2026 only; update before 2027. Do not optimize based on interim results.
+
+Weekly reconciliation and performance review is scheduled for Friday afternoons, America/Chicago, starting October 16. The review retrieves available alert events/trade exports and updates the separate GitHub CSVs; access failures are reported. The alert log runs on TradingView servers; CSV synchronization happens during reviews, not continuously.
