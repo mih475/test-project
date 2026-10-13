@@ -1,0 +1,21 @@
+{
+  "forward_start_utc": "2026-10-13T04:10:53.537Z",
+  "source": "TradingView MES 15m strategy emulator",
+  "A": {
+    "alert": "MES ORB A — Diagnostic Forward — 15m",
+    "version": 6,
+    "status": "Active"
+  },
+  "B": {
+    "alert": "MES ORB B — Diagnostic Forward — 15m",
+    "version": 5,
+    "status": "Active"
+  },
+  "alert_expiry_display": "November 12, 2026 at 21:08–21:10 (TradingView alert dialog)",
+  "webhook": false,
+  "notifications": [
+    "app",
+    "toast"
+  ],
+  "clock_basis": "Both alerts observed Active"
+}
