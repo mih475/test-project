@@ -47,3 +47,7 @@ The archived 2,404 baseline trades reproduced from the original ES one-minute da
 ## Approved session exclusion update
 
 The user approved skipping shortened sessions. Both strategies now block entries on the 2026 dates in HOLIDAY_CALENDAR.md while preserving indicator history. TradingView re-export verified 67 A trades and 56 B trades with no overnight exceptions, and unchanged remaining trade records. See TRADINGVIEW_CHECKS.md and checks/after_calendar/. Prior failure reports are retained as historical evidence. Full candle parity and alert activation remain pending.
+
+## Diagnostic activation
+
+User accepted TradingView MES as the prospective source of truth. Both diagnostic alerts are Active; see FORWARD_ACTIVE.md and forward_activation.json for the start time and event logging boundaries. Prior ES parity blocks are retained as historical limitations, not activation requirements.
