@@ -35,3 +35,7 @@ User approved skipping shortened sessions on October 12. Both saved Pine strateg
 Updated TradingView exports contain 67 A trades and 56 B trades. All structural checks pass, including same-day exits, long-only, one contract, maximum one entry per day and entry times. There are no overnight exceptions in this exported sample. A removed May 25, June 19 and July 3; B removed May 25 and July 3. Every remaining trade's entry/exit timestamps, prices, size, net P&L, commission and duration matches the corresponding pre-exclusion export exactly. Original failed checks are preserved; new evidence is in checks/after_calendar/.
 
 Both updated chart scripts compile without runtime errors and the layout was saved. The complete candle/indicator comparison remains blocked by chart-data export access. These checks do not establish full parity or future profitability. Alerts remain off; no paper or live orders were submitted.
+
+## Focused 10-session verification completed
+
+See checks/VERIFICATION.md and selected_verification.json. Selected OR, recurrence, next-open entries, brackets and close checks passed. June 1 B differed from the Python ES export because MES ADX crossed 20 one candle earlier; same-feed full parity remains unverified. Forward alerts remain inactive.
