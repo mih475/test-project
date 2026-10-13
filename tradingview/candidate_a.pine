@@ -19,6 +19,28 @@ if barstate.isfirst and (not timeframe.isminutes or timeframe.multiplier != 15)
 
 bool inRth = not na(time(timeframe.period, RTH, TZ))
 int dateKey = year(time, TZ) * 10000 + month(time, TZ) * 100 + dayofmonth(time, TZ)
+// User-approved 2026-10-12: skip shortened sessions, using dates known in advance.
+// Calendar scope: 2026 only. Refresh against CME equity-index Globex holiday
+// schedules before 2027; no entries outside the reviewed calendar year.
+// RTH indicator updates are unchanged, including available holiday bars.
+bool calendarCovered = year(time, TZ) == 2026
+bool shortenedOrClosedSession = switch dateKey
+    20260101 => true
+    20260119 => true
+    20260216 => true
+    20260403 => true
+    20260525 => true
+    20260619 => true
+    20260703 => true
+    20260907 => true
+    20261126 => true
+    20261127 => true
+    20261224 => true
+    20261225 => true
+    => false
+bool calendarAllowsEntry = calendarCovered and not shortenedOrClosedSession
+if barstate.islast and not calendarCovered
+    runtime.error("Holiday calendar covers 2026 only. Review and extend it before testing another year.")
 // Detect entry into RTH on ETH charts and the date change on RTH-only charts.
 bool newSession = inRth and (not inRth[1] or na(dateKey[1]) or dateKey != dateKey[1])
 bool openingBar = inRth and hour(time, TZ) == 9 and minute(time, TZ) == 30
@@ -125,7 +147,7 @@ if processClose and openingBar
     orHigh := high
     orLow := low
 
-bool longSignal = processClose and eligibleSignalBar and not na(orHigh) and
+bool longSignal = calendarAllowsEntry and processClose and eligibleSignalBar and not na(orHigh) and
      not tradedToday and strategy.position_size == 0 and close > orHigh and close > ema50Rth and
      not na(atr7Rth)
 if longSignal
@@ -153,3 +175,5 @@ plot(lastSignalBar == bar_index ? 1 : 0, "Parity long signal (1/0)", display=dis
 plot(rthCount, "Parity RTH bar count", display=display.data_window)
 plot(strategy.position_size > 0 ? strategy.position_avg_price + TARGET_ATR * signalAtr : na, "Parity target", display=display.data_window)
 plot(signalAtr, "Parity captured ATR", display=display.data_window)
+
+plot(shortenedOrClosedSession ? 1 : 0, "Parity skipped session (1/0)", display=display.data_window)
