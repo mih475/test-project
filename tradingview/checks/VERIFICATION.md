@@ -1,0 +1,17 @@
+# Focused verification — October 12, 2026
+
+Scope: 10 representative sessions, 57 distinct UI-observed candles; 16 candidate trade observations. Dates: May 5, 6, 22; June 1, 5; July 3; September 28; October 6, 7, 9. No parameters changed.
+
+PASS: 10 opening-range highs/lows equal the 09:30 candle; A/B common values agree; 25 consecutive-bar EMA50, ATR7 and ADX14 recurrence checks match the original Python functions within 2e-8. These checks use the previous observed value as state and do not certify full initialization history. DI values and B filter conditions were read from the Data Window; independent same-feed DI initialization remains unverified.
+
+PASS: 16 observed signals satisfy their filters and enter at the next 15-minute open at its observed open price; 14 available target plots equal entry + 1.5 × captured signal ATR. Seven target exits, four stop exits and five RTH-close exits are consistent with the observed candle and bracket. Target fills round upward to a tradable 0.25-point price; Python stores fractional targets. RTH-close CSV timestamps identify the 15:45 bar, whose close is at 16:00. September 28 enters and hits its stop within the entry candle. No sampled candle touches both stop and target, so stop-first collision equivalence is untested.
+
+Previously completed full-export checks remain valid: one long MES contract, maximum one entry/day, same-day exits, no excluded-session entries. July 3 sampled bars report skipped=1 and signal=0. Its requested 15:45 candle does not exist and UI navigation maps to the next available Sunday candle; this mapping was excluded from normal-session tests.
+
+MISMATCH: June 1 B enters at 14:15 on TradingView MES versus 14:30 in the original Python ES export. A reference calculation using the actual research functions, initialized May 1 to align the visible TradingView history, shows at 14:00: MES ADX14 20.05132708 versus ES ADX14 19.97427212. MES passes the frozen ADX>=20 condition one candle earlier. That candle's OHLC differs by up to 0.25 points. This identifies a feed-sensitive threshold crossing, not a justified reason to change ADX or tune the strategy. On May 22 both candidate entry times match, but MES entry is 0.25 points above ES. Other compared entry times/prices and the June 5 no-trade case match.
+
+LIMITATION: TradingView Essential blocks Download chart data and higher-detail Bar Magnifier. Original Python uses ES one-minute data; TradingView uses MES with default four-tick historical simulation. Complete same-feed indicator history, exact DI parity and one-minute exit sequencing remain unverified. The 30-candle cross-feed comparison is evidence, not an exact parity certificate.
+
+Disposition: both scripts are installed and compile, shortened-session handling is fixed, paper account connected. Forward alerts remain inactive because exact research-to-MES parity is not established and B has an observed cross-feed signal difference. No orders placed. No more export workarounds or broad backtests attempted.
+
+Prepared alert configuration after the parity gate: candidate A/B separately, MES standard 15-minute candles, Order fills only, one contract, webhook disabled. Message: {{strategy.order.alert_message}}|{{ticker}}|{{strategy.order.action}}|{{strategy.order.contracts}}|{{strategy.order.price}}|{{time}}|{{timenow}}. Existing forward_test_log.csv and forward_test_metrics.py record paper-account fills separately from strategy-emulator fills. Strategy alerts do not execute Paper Trading account orders.
