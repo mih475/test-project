@@ -50,3 +50,7 @@ To reproduce: put the source ES_1min_YEAR.csv files in data/ at the repository r
 ## Runtime checks completed
 
 See TRADINGVIEW_CHECKS.md. Both corrected strategies compile and run, but the no-overnight test fails on July 3, 2026. Alerts remain uncreated. Chart-data export is blocked by the Essential plan; trade-list export succeeded. No claim of complete candle parity is made.
+
+## Approved session exclusion update
+
+The user approved skipping shortened sessions. Both strategies now block entries on the 2026 dates in HOLIDAY_CALENDAR.md while preserving indicator history. TradingView re-export verified 67 A trades and 56 B trades with no overnight exceptions, and unchanged remaining trade records. See TRADINGVIEW_CHECKS.md and checks/after_calendar/. Prior failure reports are retained as historical evidence. Full candle parity and alert activation remain pending.
