@@ -23,3 +23,7 @@ Reproduce with: python tradingview/checks/check_trades.py. CSVs and machine-read
 Download chart data presented an upgrade gate: current Essential, recommended Premium. No upgrade was purchased and no gated export was bypassed. Without matching OHLC and plotted indicator rows, candle-by-candle EMA/ATR/ADX/DI/signals and next-open entry parity remain unverified. Trade export alone cannot establish them. Need a legitimately obtained matching chart CSV including both strategies' parity plots and appropriate warmup history. Intrabar exits additionally require same-source one-minute data and classification of emulator path, gaps, tick rounding and stop/target collisions.
 
 The original research uses ES prices and MES costs, and its post-filtered long variants differ from the literal frozen long-only scan. See PARITY_REVIEW.md. Do not equate archived performance with these literal frozen candidates.
+
+## Paper connection rechecked — October 12, 23:28 ET
+
+Paper Trading reconnected successfully. Balance/equity $100,000, realized/unrealized P&L $0; Positions showed no open positions and Orders/All showed no trading data. No order was submitted. Both strategies remain visible on the saved MES 15-minute layout.
