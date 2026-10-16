@@ -1,0 +1,20 @@
+- generic "Log":
+  - button "Clear log":
+  - button "Options":
+  - generic: October 15
+  - generic: MES ORB B — Diagnostic Forward — 15m
+  - generic: "{\"kind\":\"fill\",\"data\":{\"candidate\":\"B\",\"event\":\"RTH_CLOSE\",\"source\":\"TradingView MES strategy emulator\",\"symbol\":\"={\"settlement-as-close\":true,\"symbol\":\"CME_MINI:MES1!\"}\",\"signal_time_ms\":1792085400000,\"signal_close\":7787.75,\"or_high\":7747.75,\"or_low\":7725.5,\"ema50\":7783.88282575,\"atr7\":12.32075807,\"adx14\":23.9541951,\"adx_margin_20\":3.9541951,\"plus_di14\":25.2383644,\"minus_di14\":17.58265729,\"di_spread\":7.65570711,\"tag\":\"\",\"target\":7805.9811371},\"ticker\":\"MES1!\",\"action\":\"sell\",\"contracts\":1,\"fill_price\":7790.75,\"bar_time\":\"2026-10-15T19:45:00Z\",\"alert_time\":\"2026-10-15T20:00:00Z\"}"
+  - generic: MES1!, 15m•
+  - generic: 01:00:00 PM
+  - generic: MES ORB A — Diagnostic Forward — 15m
+  - generic: "{\"kind\":\"fill\",\"data\":{\"candidate\":\"A\",\"event\":\"RTH_CLOSE\",\"source\":\"TradingView MES strategy emulator\",\"symbol\":\"={\"settlement-as-close\":true,\"symbol\":\"CME_MINI:MES1!\"}\",\"signal_time_ms\":1792085400000,\"signal_close\":7787.75,\"or_high\":7747.75,\"or_low\":7725.5,\"ema50\":7783.88282575,\"atr7\":12.32075807,\"adx14\":null,\"adx_margin_20\":null,\"plus_di14\":null,\"minus_di14\":null,\"di_spread\":null,\"tag\":\"\",\"target\":7805.9811371},\"ticker\":\"MES1!\",\"action\":\"sell\",\"contracts\":1,\"fill_price\":7790.75,\"bar_time\":\"2026-10-15T19:45:00Z\",\"alert_time\":\"2026-10-15T20:00:00Z\"}"
+  - generic: MES1!, 15m•
+  - generic: 01:00:00 PM
+  - generic: MES ORB A — Diagnostic Forward — 15m
+  - generic: "{\"kind\":\"fill\",\"data\":{\"candidate\":\"A\",\"event\":\"ENTRY_FILL\",\"source\":\"TradingView MES strategy emulator\",\"symbol\":\"={\"settlement-as-close\":true,\"symbol\":\"CME_MINI:MES1!\"}\",\"signal_time_ms\":1792085400000,\"signal_close\":7787.75,\"or_high\":7747.75,\"or_low\":7725.5,\"ema50\":7783.88282575,\"atr7\":12.32075807,\"adx14\":null,\"adx_margin_20\":null,\"plus_di14\":null,\"minus_di14\":null,\"di_spread\":null,\"tag\":\"\",\"target\":null},\"ticker\":\"MES1!\",\"action\":\"buy\",\"contracts\":1,\"fill_price\":7787.50,\"bar_time\":\"2026-10-15T17:45:00Z\",\"alert_time\":\"2026-10-15T17:45:00Z\"}"
+  - generic: MES1!, 15m•
+  - generic: 10:45:00 AM
+  - generic: MES ORB B — Diagnostic Forward — 15m
+  - generic: "{\"kind\":\"fill\",\"data\":{\"candidate\":\"B\",\"event\":\"ENTRY_FILL\",\"source\":\"TradingView MES strategy emulator\",\"symbol\":\"={\"settlement-as-close\":true,\"symbol\":\"CME_MINI:MES1!\"}\",\"signal_time_ms\":1792085400000,\"signal_close\":7787.75,\"or_high\":7747.75,\"or_low\":7725.5,\"ema50\":7783.88282575,\"atr7\":12.32075807,\"adx14\":23.9541951,\"adx_margin_20\":3.9541951,\"plus_di14\":25.2383644,\"minus_di14\":17.58265729,\"di_spread\":7.65570711,\"tag\":\"\",\"target\":null},\"ticker\":\"MES1!\",\"action\":\"buy\",\"contracts\":1,\"fill_price\":7787.50,\"bar_time\":\"2026-10-15T17:45:00Z\",\"alert_time\":\"2026-10-15T17:45:00Z\"}"
+  - generic: MES1!, 15m•
+  - generic: 10:45:00 AM
