@@ -1,0 +1,30 @@
+{
+  "review_date": "2026-10-23",
+  "forward_start_utc": "2026-10-13T04:10:53.537Z",
+  "alerts": {
+    "A": "Active",
+    "B": "Active"
+  },
+  "A": {
+    "signals": 4,
+    "completed_trades": 4,
+    "new_trades": 3,
+    "win_rate": 0.75,
+    "dollar_profit_factor_after_commissions": 2.7476635514018692,
+    "expectancy_r": 0.1724659375460304,
+    "net_pnl_usd": 140.25,
+    "closed_equity_max_drawdown_usd": 80.25,
+    "near_threshold_signals": 0
+  },
+  "B": {
+    "signals": 3,
+    "completed_trades": 3,
+    "new_trades": 2,
+    "win_rate": 0.3333333333333333,
+    "dollar_profit_factor_after_commissions": 0.11991869918699187,
+    "expectancy_r": -0.39048899129544284,
+    "net_pnl_usd": -108.25,
+    "closed_equity_max_drawdown_usd": 123,
+    "near_threshold_signals": 0
+  }
+}
