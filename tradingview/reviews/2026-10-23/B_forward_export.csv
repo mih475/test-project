@@ -1,0 +1,7 @@
+Trade number,Type,Date and time,Signal,Price USD,Size (qty),Size (value),Net PnL USD,Return %,Commission USD,Favorable excursion USD,Favorable excursion %,Adverse excursion USD,Adverse excursion %,Cumulative PnL USD,Cumulative PnL %,Duration (bars)
+57,Exit long,2026-10-15 15:45,RTH close,7790.75,1,38937.5,14.75,0.04,1.5,70.5,0.18,-115.75,-0.30,-1120.5,-1.12,8
+57,Entry long,2026-10-15 13:45,B-L,7787.5,1,38937.5,14.75,0.04,1.5,70.5,0.18,-115.75,-0.30,-1120.5,-1.12,8
+58,Exit long,2026-10-19 13:45,B-X,7737,1,38763.75,-80.25,-0.21,1.5,101.75,0.26,-79.5,-0.21,-1200.75,-1.20,14
+58,Entry long,2026-10-19 10:15,B-L,7752.75,1,38763.75,-80.25,-0.21,1.5,101.75,0.26,-79.5,-0.21,-1200.75,-1.20,14
+59,Exit long,2026-10-21 15:45,RTH close,7799,1,39036.25,-42.75,-0.11,1.5,21.75,0.06,-183.25,-0.47,-1243.5,-1.24,9
+59,Entry long,2026-10-21 13:30,B-L,7807.25,1,39036.25,-42.75,-0.11,1.5,21.75,0.06,-183.25,-0.47,-1243.5,-1.24,9
