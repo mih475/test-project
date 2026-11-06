@@ -1,0 +1,33 @@
+{
+  "review_date": "2026-11-06",
+  "forward_start_utc": "2026-10-13T04:10:53.537Z",
+  "alerts": {
+    "A": "Active",
+    "B": "Active"
+  },
+  "metrics_basis": "live alert fills; matching export commissions",
+  "A": {
+    "signals": 10,
+    "completed_trades": 10,
+    "new_completed": 2,
+    "week_net_usd": 78.25,
+    "win_rate": 0.6,
+    "dollar_profit_factor_after_commissions": 1.553346587143804,
+    "expectancy_r": 0.20091932447125327,
+    "net_pnl_usd": 208.75,
+    "closed_equity_max_drawdown_usd": 224.25,
+    "near_threshold_signals": 0
+  },
+  "B": {
+    "signals": 8,
+    "completed_trades": 8,
+    "new_completed": 2,
+    "week_net_usd": 78.25,
+    "win_rate": 0.375,
+    "dollar_profit_factor_after_commissions": 0.9004048582995952,
+    "expectancy_r": -0.03329007599263082,
+    "net_pnl_usd": -30.75,
+    "closed_equity_max_drawdown_usd": 123.75,
+    "near_threshold_signals": 0
+  }
+}
