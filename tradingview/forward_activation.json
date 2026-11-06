@@ -24,8 +24,8 @@
   "clock_basis": "Both alerts observed Active",
   "last_verified_account": "iaqhan_sidegig",
   "trigger": "Order fills only",
-  "last_verified_utc": "2026-10-30T21:40:39Z",
+  "last_verified_utc": "2026-11-06T22:45:21Z",
   "forward_clock_restarted": false,
   "display_timezone": "not labeled in alert details; timestamps preserved exactly as displayed",
-  "last_review_path": "tradingview/reviews/2026-10-30/REVIEW.md"
+  "last_review_path": "tradingview/reviews/2026-11-06/REVIEW.md"
 }
