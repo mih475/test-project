@@ -4,14 +4,14 @@
   "A": {
     "alert": "MES ORB A — Diagnostic Forward — 15m",
     "version": 6,
-    "status": "Active",
+    "status": "Stopped — Expired",
     "created_display": "Mon 10/12/2026 09:10:07 PM",
     "expiration_display": "November 12, 2026 at 21:08"
   },
   "B": {
     "alert": "MES ORB B — Diagnostic Forward — 15m",
     "version": 5,
-    "status": "Active",
+    "status": "Stopped — Expired",
     "created_display": "Mon 10/12/2026 09:10:32 PM",
     "expiration_display": "November 12, 2026 at 22:10"
   },
@@ -24,8 +24,11 @@
   "clock_basis": "Both alerts observed Active",
   "last_verified_account": "iaqhan_sidegig",
   "trigger": "Order fills only",
-  "last_verified_utc": "2026-11-06T22:45:21Z",
+  "last_verified_utc": "2026-11-13T22:39:57Z",
   "forward_clock_restarted": false,
   "display_timezone": "not labeled in alert details; timestamps preserved exactly as displayed",
-  "last_review_path": "tradingview/reviews/2026-11-06/REVIEW.md"
+  "last_review_path": "tradingview/reviews/2026-11-13/REVIEW.md",
+  "collection_status": "blocked_alerts_expired",
+  "recording_gap_from_session": "2026-11-13",
+  "renewal_required": true
 }
