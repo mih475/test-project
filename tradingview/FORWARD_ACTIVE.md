@@ -1,4 +1,8 @@
-# MES diagnostic forward test active
+# MES diagnostic forward test — alerts expired
+
+**Current status, verified November 13, 2026:** both diagnostic alerts are Stopped — Expired after their November 12 expiration. Recorded fills are reconciled through November 12. November 13 and later are a prospective recording gap until renewed alerts are confirmed Active. The original forward clock is preserved. Weekly review is paused pending renewal. See reviews/2026-11-13/REVIEW.md for reconciled totals and discrepancies.
+
+## Original activation and operating rules
 
 Forward clock: 2026-10-13T04:10:53.537Z. Both TradingView alerts were observed Active.
 
