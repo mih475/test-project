@@ -1,0 +1,47 @@
+{
+  "review_date": "2026-11-13",
+  "recorded_through_session": "2026-11-12",
+  "recording_gap_from_session": "2026-11-13",
+  "forward_start_utc": "2026-10-13T04:10:53.537Z",
+  "alerts": {
+    "A": "Stopped — Expired",
+    "B": "Stopped — Expired"
+  },
+  "review_automation_enabled": false,
+  "metrics_basis": "live alert fills; matching export commissions",
+  "A": {
+    "signals": 14,
+    "completed_trades": 14,
+    "new_completed": 4,
+    "week_net_usd": 304,
+    "win_rate": 0.6428571428571429,
+    "dollar_profit_factor_after_commissions": 1.8975929978118162,
+    "expectancy_r": 0.22139152685171753,
+    "net_pnl_usd": 512.75,
+    "closed_equity_max_drawdown_usd": 224.25,
+    "near_threshold_signals": 0
+  },
+  "B": {
+    "signals": 11,
+    "completed_trades": 11,
+    "new_completed": 3,
+    "week_net_usd": 124.25,
+    "win_rate": 0.45454545454545453,
+    "dollar_profit_factor_after_commissions": 1.1695376246600182,
+    "expectancy_r": 0.06785707339898013,
+    "net_pnl_usd": 93.5,
+    "closed_equity_max_drawdown_usd": 242.75,
+    "near_threshold_signals": 0
+  },
+  "new_mismatches": [
+    {
+      "candidate": "A",
+      "session_date": "2026-11-10",
+      "live_exit": 7512.75,
+      "export_exit": 7514.25,
+      "live_net": -194,
+      "export_net": -186.5,
+      "difference_usd": -7.5
+    }
+  ]
+}
