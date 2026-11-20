@@ -1,6 +1,8 @@
-# MES diagnostic forward test — alerts expired
+# MES diagnostic forward test — renewed alerts verified Active
 
-**Current status, verified November 13, 2026:** both diagnostic alerts are Stopped — Expired after their November 12 expiration. Recorded fills are reconciled through November 12. November 13 and later are a prospective recording gap until renewed alerts are confirmed Active. The original forward clock is preserved. Weekly review is paused pending renewal. See reviews/2026-11-13/REVIEW.md for reconciled totals and discrepancies.
+**Current status, verified November 20, 2026:** both diagnostic alerts visually show green Active on MES1!, 15m, under iaqhan_sidegig. Renewed expiration displayed: A January 14, 2027 at 21:12; B January 14, 2027 at 21:11 (dialog timezone unlabeled). Both remain Order fills only with the original message. No new log events or emulator trades after November 12 were visible; CSVs unchanged. Exact reactivation time is unavailable; preserve the November 13-to-reactivation gap and original forward start. Weekly review remains scheduled. See reviews/2026-11-20/REVIEW.md.
+
+**Before January:** the 2026-only Pine calendar prevents 2027 entries. Reviewed 2027 calendar maintenance and refreshed alert snapshots are still required; no source, calendar, or alert snapshots were changed in this review.
 
 ## Original activation and operating rules
 
