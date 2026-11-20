@@ -4,18 +4,18 @@
   "A": {
     "alert": "MES ORB A — Diagnostic Forward — 15m",
     "version": 6,
-    "status": "Stopped — Expired",
+    "status": "Active",
     "created_display": "Mon 10/12/2026 09:10:07 PM",
-    "expiration_display": "November 12, 2026 at 21:08"
+    "expiration_display": "January 14, 2027 at 21:12"
   },
   "B": {
     "alert": "MES ORB B — Diagnostic Forward — 15m",
     "version": 5,
-    "status": "Stopped — Expired",
+    "status": "Active",
     "created_display": "Mon 10/12/2026 09:10:32 PM",
-    "expiration_display": "November 12, 2026 at 22:10"
+    "expiration_display": "January 14, 2027 at 21:11"
   },
-  "alert_expiry_display": "November 12, 2026 at 21:08–21:10 (TradingView alert dialog)",
+  "alert_expiry_display": "January 14, 2027; A 21:12, B 21:11 (UI timezone unlabeled)",
   "webhook": false,
   "notifications": [
     "app",
@@ -24,11 +24,14 @@
   "clock_basis": "Both alerts observed Active",
   "last_verified_account": "iaqhan_sidegig",
   "trigger": "Order fills only",
-  "last_verified_utc": "2026-11-13T22:39:57Z",
+  "last_verified_utc": "2026-11-20T22:50:30Z",
   "forward_clock_restarted": false,
   "display_timezone": "not labeled in alert details; timestamps preserved exactly as displayed",
-  "last_review_path": "tradingview/reviews/2026-11-13/REVIEW.md",
-  "collection_status": "blocked_alerts_expired",
+  "last_review_path": "tradingview/reviews/2026-11-20/REVIEW.md",
+  "collection_status": "active_verified_no_new_events",
   "recording_gap_from_session": "2026-11-13",
-  "renewal_required": true
+  "renewal_required": false,
+  "reactivation_time_utc": null,
+  "reactivation_note": "User reported renewal November 16; both visually Active November 20. Exact reactivation timestamp unavailable. Preserve November 13-to-reactivation gap; do not backfill.",
+  "calendar_maintenance_required_before_2027": true
 }
